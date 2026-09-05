@@ -1,26 +1,62 @@
 /* CKA BuildStruct — public-forms.js
    Replaces legacy simulated success for supplier registration and
-   rate-list subscription with verified Supabase RPC submissions. */
+   rate list subscription with verified Supabase RPC submissions. */
 (function (global) {
   "use strict";
 
   const client = global.CKAStore && global.CKAStore.supabase;
 
+  function setText(selector, value) {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = value;
+  }
+
   function installHomepagePolish() {
     const title = document.querySelector(".hero h1");
-    if (title && /Source\s+smarter/i.test(title.textContent || "")) {
-      title.textContent = "Build with confidence.";
-    }
+    if (title) title.textContent = "Build with confidence.";
+
+    setText(
+      ".hero .lead",
+      "CKA BuildStruct is Pakistan's managed construction procurement platform, connecting project owners, builders and contractors with verified suppliers through live market rates, BOQ based quotations and professional design support."
+    );
+    setText(
+      ".hero__trust",
+      "Rated 4.9/5 by 2,300+ project owners in Rawalpindi, Islamabad and Lahore"
+    );
+    setText(
+      "#showcase .sec-head h2",
+      "Drawings, materials and live sites in one place."
+    );
+    setText(
+      "#showcase .sec-head__note",
+      "A snapshot of what CKA BuildStruct manages for you: field verified drawings, sourced materials and design previews, alongside every live project site."
+    );
+    setText(
+      ".home-cta__text h3",
+      "Wherever you are in your project"
+    );
+
+    document.querySelectorAll(".cta__in p").forEach((el) => {
+      if (/Cement, steel, bricks and sand rates every morning/i.test(el.textContent || "")) {
+        el.textContent = "Cement, steel, bricks and sand rates every morning, plus quotation support for your BOQ.";
+      }
+    });
+
+    document.querySelectorAll(".pay-methods small").forEach((el) => {
+      if (/IBFT\s*\/\s*RTGS/i.test(el.textContent || "")) {
+        el.textContent = "IBFT / RTGS. Details shared with quotation";
+      }
+    });
 
     const video = document.querySelector(".hero__video");
-    if (video && !video.dataset.ckaPremiumHero) {
-      video.dataset.ckaPremiumHero = "true";
+    if (video && !video.dataset.ckaProvidedHero) {
+      video.dataset.ckaProvidedHero = "true";
       video.muted = true;
       video.loop = true;
       video.playsInline = true;
       const source = global.matchMedia && global.matchMedia("(max-width: 640px)").matches
-        ? "assets/video/design-360.mp4"
-        : "assets/video/design-720.mp4";
+        ? "assets/video/hero-540.mp4"
+        : "assets/video/hero-720.mp4";
       video.pause();
       video.src = source;
       video.load();
@@ -94,7 +130,7 @@
         form.reset();
         setStatus(
           form,
-          `Registration received — reference ${reference}. CKA will review the application before supplier approval.`,
+          `Registration received. Reference ${reference}. CKA will review the application before supplier approval.`,
           true
         );
         console.log("CKA SUPPLIER APPLICATION:", reference);
@@ -135,7 +171,7 @@
           if (!data) throw new Error("Subscription was not confirmed.");
 
           form.reset();
-          setStatus(form, "Subscribed — your email is registered for CKA rate-list updates.", true);
+          setStatus(form, "Subscribed. Your email is registered for CKA rate list updates.", true);
         } catch (err) {
           console.error("CKA RATE LIST SUBSCRIPTION FAILED:", err);
           setStatus(form, err?.message || "Could not subscribe this email. Please try again.", false);
