@@ -1,57 +1,53 @@
--- CKA BuildStruct — production catalogue reconciliation
--- Date: 2026-09-05
+-- CKA BuildStruct — verified production catalogue reconciliation
+-- Applied to Supabase project qrjglihvjhhemqoegqmt on 2026-09-05.
 --
--- IMPORTANT
--- This migration is additive/non-destructive and is intended to reconcile the
--- repository with the already-running Supabase catalogue. It does NOT delete
--- products, categories, product images, storage objects, users or suppliers.
--- Review against the live Supabase schema before executing.
+-- This migration is intentionally non-destructive:
+-- - does not delete product/category/supplier rows
+-- - does not delete Storage objects
+-- - keeps project-uploads private
+-- - uses the existing public product-images bucket for catalogue media
+-- - keeps products.image_url as the canonical main image
+-- - preserves product_images as optional gallery media
 
 begin;
 
--- ---------------------------------------------------------------------------
--- 1. Official product shape used by the current admin editor
--- ---------------------------------------------------------------------------
--- Main image architecture:
---   products.image_url      = canonical/main product image
---   product_images          = optional additional gallery images
---
--- This keeps the already-tested products.image_url workflow while preserving
--- the normalized gallery table for future multi-image support.
+create schema if not exists private;
 
-alter table products add column if not exists image_url text;
-alter table products add column if not exists quality text;
-alter table products add column if not exists grade text;
-alter table products add column if not exists size text;
-alter table products add column if not exists badge text;
+-- Supplier display data is needed by the public catalogue view, while the
+-- suppliers table itself remains protected by RLS. Keep the helper out of the
+-- exposed public schema and expose only its return values through the view.
+create or replace function private.catalogue_supplier(p_supplier_id uuid)
+returns table(company_name text, is_verified boolean)
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  select s.company_name, s.is_verified
+  from public.suppliers s
+  where s.id = p_supplier_id;
+$$;
 
--- Useful guardrails without rewriting existing data.
-do $$ begin
-  alter table products
-    add constraint products_rating_range
-    check (rating is null or (rating >= 0 and rating <= 5));
-exception when duplicate_object then null; end $$;
+revoke all on function private.catalogue_supplier(uuid) from public;
+grant usage on schema private to anon, authenticated;
+grant execute on function private.catalogue_supplier(uuid) to anon, authenticated;
 
--- ---------------------------------------------------------------------------
--- 2. Catalogue view aligned with the live admin/public product contract
--- ---------------------------------------------------------------------------
-create or replace view v_catalogue as
+-- The catalogue view must obey the calling role's RLS policies.
+create or replace view public.v_catalogue
+with (security_invoker = true)
+as
 select
   p.id,
   p.sku,
   p.name,
   p.brand,
-  p.description,
   p.unit,
-  p.quality,
-  p.grade,
-  p.size,
-  p.badge,
   p.price,
   p.old_price,
   p.price_min,
   p.price_max,
   p.stock,
+  p.quality,
   p.is_featured,
   p.display_order,
   p.rating,
@@ -59,127 +55,108 @@ select
   p.specifications,
   p.tags,
   p.price_checked_at,
-  p.image_url,
-  c.id    as category_id,
-  c.slug  as category_slug,
-  c.name  as category_name,
-  pc.id   as parent_category_id,
+  p.description,
+  c.slug as category_slug,
+  c.name as category_name,
   pc.name as parent_category,
-  s.id    as supplier_id,
-  s.company_name as supplier_name,
-  s.is_verified  as supplier_verified,
-
-  -- Canonical main image first; fall back to legacy gallery position 0.
+  sup.company_name as supplier_name,
+  sup.is_verified as supplier_verified,
   coalesce(
-    nullif(p.image_url, ''),
-    (select i.url
-       from product_images i
+    p.image_url,
+    (
+      select i.url
+      from public.product_images i
       where i.product_id = p.id
       order by i.position
-      limit 1)
+      limit 1
+    )
   ) as main_image,
-
-  -- Gallery remains product_images. If no gallery rows exist, expose the
-  -- canonical main image as a one-item array so older frontend code still works.
   coalesce(
-    (select jsonb_agg(
-       jsonb_build_object('url', i.url, 'alt', i.alt, 'position', i.position)
-       order by i.position
-     )
-     from product_images i
-     where i.product_id = p.id),
-    case
-      when nullif(p.image_url, '') is not null
-        then jsonb_build_array(jsonb_build_object(
-          'url', p.image_url,
-          'alt', p.name,
-          'position', 0
-        ))
-      else '[]'::jsonb
-    end
+    (
+      select jsonb_agg(
+        jsonb_build_object('url', imgs.url, 'alt', imgs.alt)
+        order by imgs.position
+      )
+      from (
+        select p.image_url as url, p.name as alt, -1::integer as position
+        where p.image_url is not null and btrim(p.image_url) <> ''
+        union all
+        select i.url, coalesce(i.alt, p.name), i.position::integer
+        from public.product_images i
+        where i.product_id = p.id
+          and (p.image_url is null or i.url <> p.image_url)
+      ) imgs
+    ),
+    '[]'::jsonb
   ) as images,
-
   coalesce(
-    (select jsonb_agg(
-       jsonb_build_object(
-         'label', v.label,
-         'grade', v.grade,
-         'size', v.size,
-         'price_delta', v.price_delta,
-         'stock', v.stock
-       ) order by v.display_order
-     )
-     from product_variants v
-     where v.product_id = p.id),
+    (
+      select jsonb_agg(
+        jsonb_build_object(
+          'label', v.label,
+          'grade', v.grade,
+          'size', v.size,
+          'price_delta', v.price_delta,
+          'stock', v.stock
+        )
+        order by v.display_order
+      )
+      from public.product_variants v
+      where v.product_id = p.id
+    ),
     '[]'::jsonb
   ) as variants
+from public.products p
+join public.categories c on c.id = p.category_id
+left join public.categories pc on pc.id = c.parent_id
+left join lateral private.catalogue_supplier(p.supplier_id)
+  sup(company_name, is_verified) on true
+where p.is_active and c.is_active;
 
-from products p
-join categories c       on c.id = p.category_id
-left join categories pc on pc.id = c.parent_id
-left join suppliers s   on s.id = p.supplier_id
-where p.is_active;
+-- The public helper is no longer required after the view is switched to the
+-- private helper.
+drop function if exists public.catalogue_supplier(uuid);
 
--- ---------------------------------------------------------------------------
--- 3. Storage policies
--- ---------------------------------------------------------------------------
--- The old repository policy allowed anonymous INSERT anywhere in the bucket.
--- Keep public project/BOQ uploads working, but reserve product-images/ for
--- authenticated admin/staff users. Existing objects are untouched.
+-- Role helper functions are used internally by RLS. Anonymous callers should
+-- not be able to invoke them as public RPC endpoints.
+revoke execute on function public.is_staff() from public, anon;
+grant execute on function public.is_staff() to authenticated;
+revoke execute on function public.is_admin() from public, anon;
+grant execute on function public.is_admin() to authenticated;
 
-drop policy if exists "public upload project-uploads" on storage.objects;
-create policy "public upload project-uploads"
-on storage.objects
-for insert
+-- Fix mutable search_path advisor finding on the shared timestamp trigger.
+alter function public.touch_updated_at() set search_path = public, pg_temp;
+
+-- site_content had RLS enabled without any policies.
+drop policy if exists "public read content" on public.site_content;
+create policy "public read content"
+on public.site_content for select
 to anon, authenticated
-with check (
-  bucket_id = 'project-uploads'
-  and coalesce((storage.foldername(name))[1], '') <> 'product-images'
-);
+using (true);
 
-drop policy if exists "admin upload product images" on storage.objects;
-create policy "admin upload product images"
-on storage.objects
-for insert
+drop policy if exists "staff write content" on public.site_content;
+create policy "staff write content"
+on public.site_content for all
 to authenticated
-with check (
-  bucket_id = 'project-uploads'
-  and (storage.foldername(name))[1] = 'product-images'
-  and is_staff()
-);
+using (public.is_staff())
+with check (public.is_staff());
 
-drop policy if exists "admin update product images" on storage.objects;
-create policy "admin update product images"
-on storage.objects
-for update
+-- Product catalogue media belongs in the dedicated public product-images
+-- bucket. Project/BOQ files remain in the private project-uploads bucket.
+update storage.buckets
+set file_size_limit = 10485760,
+    allowed_mime_types = array['image/jpeg','image/png','image/webp']::text[]
+where id = 'product-images';
+
+drop policy if exists "staff manage product-images" on storage.objects;
+create policy "staff manage product-images"
+on storage.objects for all
 to authenticated
-using (
-  bucket_id = 'project-uploads'
-  and (storage.foldername(name))[1] = 'product-images'
-  and is_staff()
-)
-with check (
-  bucket_id = 'project-uploads'
-  and (storage.foldername(name))[1] = 'product-images'
-  and is_staff()
-);
+using (bucket_id = 'product-images' and public.is_staff())
+with check (bucket_id = 'product-images' and public.is_staff());
 
-drop policy if exists "admin delete product images" on storage.objects;
-create policy "admin delete product images"
-on storage.objects
-for delete
-to authenticated
-using (
-  bucket_id = 'project-uploads'
-  and (storage.foldername(name))[1] = 'product-images'
-  and is_staff()
-);
-
--- Public read remains intentional for product catalogue imagery.
-drop policy if exists "public read project-uploads" on storage.objects;
-create policy "public read project-uploads"
-on storage.objects
-for select
-using (bucket_id = 'project-uploads');
+-- Remove the obsolete policy that encouraged product media to be uploaded
+-- inside the private project-uploads bucket.
+drop policy if exists "id=""d9e7zq"" admin upload product images 763gf2_0" on storage.objects;
 
 commit;
