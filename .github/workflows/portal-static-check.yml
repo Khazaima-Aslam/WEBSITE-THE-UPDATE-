@@ -50,8 +50,6 @@ jobs:
             assets/css/apple-premium.css \
             assets/video/hero-720.mp4 \
             assets/video/hero-540.mp4 \
-            assets/video/design-720.mp4 \
-            assets/video/design-360.mp4 \
             assets/js/store.js \
             assets/js/public-forms.js \
             assets/js/backend-api.js \
@@ -88,7 +86,7 @@ jobs:
           grep -q 'admin-catalogue-pro.css' admin.html
           grep -q 'admin-catalogue-pro.js?v=1' assets/js/admin-runtime.js
 
-      - name: Premium navigation and hero scope
+      - name: Approved navigation copy and hero slots
         shell: bash
         run: |
           set -euo pipefail
@@ -99,11 +97,14 @@ jobs:
           grep -q 'height:44px' assets/css/apple-premium.css
           grep -q 'height:52px' assets/css/apple-premium.css
           grep -q 'backdrop-filter:saturate(180%) blur(20px)' assets/css/apple-premium.css
-          grep -q 'Build with confidence.' assets/js/public-forms.js
-          grep -q 'assets/video/design-720.mp4' assets/js/public-forms.js
-          grep -q 'assets/video/design-360.mp4' assets/js/public-forms.js
-          test "$(stat -c%s assets/video/design-720.mp4)" -gt 1000000
-          test "$(stat -c%s assets/video/design-360.mp4)" -gt 250000
+          grep -q '<h1>Build with confidence.</h1>' index.html
+          ! grep -q 'Source <em>smarter' index.html
+          ! grep -q '&mdash;' index.html
+          grep -q 'assets/video/hero-720.mp4' index.html
+          grep -q 'assets/video/hero-720.mp4' assets/js/public-forms.js
+          grep -q 'assets/video/hero-540.mp4' assets/js/public-forms.js
+          test "$(stat -c%s assets/video/hero-720.mp4)" -gt 500000
+          test "$(stat -c%s assets/video/hero-540.mp4)" -gt 500000
 
       - name: Migration records
         shell: bash
