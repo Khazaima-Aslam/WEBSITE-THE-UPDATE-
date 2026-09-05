@@ -4,7 +4,7 @@
    Production bootstrap for the materials marketplace.
    - Loads v_catalogue before the existing app starts.
    - Keeps data.js as an emergency catalogue fallback.
-   - Bridges Supabase UUIDs to the legacy numeric cart contract.
+   - Bridges Supabase UUIDs to stable numeric IDs for the legacy cart UI.
    - Persists checkout through the validated submit_quote RPC before
      allowing the existing success UI to run.
    ═══════════════════════════════════════════════════════════════ */
@@ -12,8 +12,16 @@
   "use strict";
 
   const MIN_EXPECTED_PRODUCTS = 1;
-  const LIVE_ID_BASE = 100000;
   const CART_KEY = "cka-basket-v1";
+
+  function stableUiId(uuid) {
+    const hex = String(uuid || "").replace(/-/g, "").slice(0, 12);
+    const value = Number.parseInt(hex, 16);
+    if (!Number.isSafeInteger(value) || value <= 0) {
+      throw new Error("Invalid live product UUID");
+    }
+    return value;
+  }
 
   function humanStock(value) {
     return ({
@@ -31,7 +39,7 @@
     return `PKR ${format(min)} – ${format(max)}`;
   }
 
-  function toProduct(row, index) {
+  function toProduct(row) {
     const specs = row.specifications && typeof row.specifications === "object"
       ? row.specifications
       : {};
@@ -42,9 +50,9 @@
     const images = [mainImage, ...gallery.filter((url) => url !== mainImage)];
 
     return {
-      // app.js historically coerces data-* product IDs with unary +. Keep a
-      // numeric UI/cart identifier, but carry the real database UUID separately.
-      id: LIVE_ID_BASE + index,
+      // app.js historically coerces data-* IDs with unary +. Derive a stable,
+      // safe integer from the immutable product UUID and carry the UUID as dbId.
+      id: stableUiId(row.id),
       dbId: row.id,
       sku: row.sku || "",
       title: row.name || "",
@@ -100,8 +108,6 @@
         throw new Error("A basket item has an invalid quantity.");
       }
 
-      // Live catalogue lines send only the trusted database identity and qty;
-      // submit_quote reads the authoritative name/unit/price server-side.
       if (product.dbId) {
         return {
           product_id: product.dbId,
@@ -110,8 +116,6 @@
         };
       }
 
-      // Static fallback can still submit honestly as a custom line if the live
-      // catalogue fetch failed. The server validates and bounds these values.
       return {
         name: product.title,
         unit: product.unit,
@@ -137,8 +141,6 @@
 
     button.addEventListener("click", async function (event) {
       if (allowExistingSuccessHandler || checkoutView.hidden) return;
-
-      // Let app.js show its existing inline validation UI when invalid.
       if (!form.checkValidity()) return;
 
       event.preventDefault();
@@ -176,8 +178,6 @@
         if (error) throw error;
         if (!reference) throw new Error("Server did not return a quotation reference.");
 
-        // Now permit the original app handler to perform its established cart
-        // clearing, form reset, drawer state transition and accessibility work.
         button.disabled = false;
         button.innerHTML = originalHtml;
         allowExistingSuccessHandler = true;
@@ -240,10 +240,11 @@
         throw new Error("Live catalogue rows failed validation");
       }
 
-      // Deliberately clear any legacy numeric seed-cart lines when switching to
-      // runtime IDs: matching an old numeric ID to a different live product would
-      // be worse than asking the visitor to rebuild a small basket once.
-      try { localStorage.removeItem(CART_KEY); } catch (err) {}
+      const ids = new Set();
+      for (const product of live) {
+        if (ids.has(product.id)) throw new Error("Live catalogue UI ID collision detected");
+        ids.add(product.id);
+      }
 
       PRODUCTS.splice(0, PRODUCTS.length, ...live);
       console.log(`CKA PUBLIC: loaded ${live.length} products from Supabase`);
