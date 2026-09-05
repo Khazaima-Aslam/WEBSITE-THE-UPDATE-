@@ -84,7 +84,8 @@
     client: supabaseClient,
 
     auth: {
-      profile: currentProfile
+      profile: currentProfile,
+      signOut: () => supabaseClient().auth.signOut()
     },
 
     notifications,
@@ -117,16 +118,28 @@
           eq: [["quote_id", quoteId]],
           order: { column: "id", ascending: true }
         }),
-        update: (quoteId, changes) => rpc("staff_update_quote", {
-          p_quote_id: quoteId,
-          p_status: changes && changes.status != null ? changes.status : null,
-          p_assigned_to: changes && changes.assignedTo != null ? changes.assignedTo : null,
-          p_internal_notes: changes && changes.internalNotes != null ? changes.internalNotes : null
-        }),
+        update: (quoteId, changes) => {
+          if (changes && changes.status === "bidding") {
+            throw new Error("Use staff.quotes.openBidding() so the tender has a controlled deadline and validity policy.");
+          }
+          return rpc("staff_update_quote", {
+            p_quote_id: quoteId,
+            p_status: changes && changes.status != null ? changes.status : null,
+            p_assigned_to: changes && changes.assignedTo != null ? changes.assignedTo : null,
+            p_internal_notes: changes && changes.internalNotes != null ? changes.internalNotes : null
+          });
+        },
         assign: (quoteId, profileId) => rpc("staff_assign_quote", {
           p_quote_id: quoteId,
           p_assigned_to: profileId == null ? null : profileId
         }),
+        openBidding: (quoteId, closesAt, allowPartialBids, minValidityDays) => rpc("staff_open_bidding", {
+          p_quote_id: quoteId,
+          p_closes_at: closesAt,
+          p_allow_partial_bids: !!allowPartialBids,
+          p_min_validity_days: minValidityDays == null ? 3 : Number(minValidityDays)
+        }),
+        closeBidding: (quoteId) => rpc("staff_close_bidding", { p_quote_id: quoteId }),
         subscribe: (callback) => subscribeTo("quotes", callback)
       },
 
@@ -199,10 +212,16 @@
       bids: {
         listForQuote: (quoteId) => rows("supplier_bids", {
           eq: [["quote_id", quoteId]],
-          order: { column: "placed_at", ascending: false }
+          order: { column: "revision_no", ascending: false }
         }),
+        items: (bidId) => rows("supplier_bid_items", {
+          eq: [["bid_id", bidId]],
+          order: { column: "id", ascending: true }
+        }),
+        comparison: (quoteId) => rpc("staff_bid_comparison", { p_quote_id: quoteId }),
         award: (bidId) => rpc("staff_award_bid", { p_bid_id: bidId }),
-        subscribe: (callback) => subscribeTo("supplier_bids", callback)
+        subscribe: (callback) => subscribeTo("supplier_bids", callback),
+        subscribeItems: (callback) => subscribeTo("supplier_bid_items", callback)
       },
 
       newsletter: {
@@ -237,22 +256,34 @@
 
     supplier: {
       tenders: () => rpc("supplier_open_tenders"),
-      submitBid: (quoteId, rate, deliveryDays, terms) => rpc("supplier_submit_bid", {
-        p_quote_id: quoteId,
-        p_rate: rate,
-        p_delivery_days: deliveryDays == null ? null : deliveryDays,
-        p_terms: terms || null
-      }),
+      submitBid: (quoteId, items, options) => {
+        const opts = options || {};
+        return rpc("supplier_submit_bid_v2", {
+          p_quote_id: quoteId,
+          p_items: items,
+          p_delivery_days: opts.deliveryDays == null || opts.deliveryDays === "" ? null : Number(opts.deliveryDays),
+          p_terms: opts.terms || null,
+          p_valid_until: opts.validUntil || null,
+          p_freight_included: !!opts.freightIncluded,
+          p_tax_included: !!opts.taxIncluded
+        });
+      },
+      withdrawBid: (bidId) => rpc("supplier_withdraw_bid", { p_bid_id: bidId }),
       bids: (limit) => rows("supplier_bids", {
         order: { column: "placed_at", ascending: false },
         limit: limit || 200
+      }),
+      bidItems: (bidId) => rows("supplier_bid_items", {
+        eq: [["bid_id", bidId]],
+        order: { column: "id", ascending: true }
       }),
       profile: async () => {
         const list = await rows("suppliers", { limit: 2 });
         return list.length === 1 ? list[0] : (list[0] || null);
       },
       notifications,
-      subscribeBids: (callback) => subscribeTo("supplier_bids", callback)
+      subscribeBids: (callback) => subscribeTo("supplier_bids", callback),
+      subscribeBidItems: (callback) => subscribeTo("supplier_bid_items", callback)
     },
 
     customer: {
@@ -261,9 +292,17 @@
         order: { column: "submitted_at", ascending: false },
         limit: limit || 200
       }),
+      quoteItems: (quoteId) => rows("quote_items", {
+        eq: [["quote_id", quoteId]],
+        order: { column: "id", ascending: true }
+      }),
       projects: (limit) => rows("projects", {
         order: { column: "created_at", ascending: false },
         limit: limit || 200
+      }),
+      projectFiles: (projectId) => rows("project_files", {
+        eq: [["project_id", projectId]],
+        order: { column: "uploaded_at", ascending: false }
       }),
       claimQuote: (reference, phone) => rpc("customer_claim_quote", {
         p_reference: reference,
