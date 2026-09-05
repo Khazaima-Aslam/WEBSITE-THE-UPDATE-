@@ -1,11 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════
    CKA BuildStruct — backend-api.js
-   Typed-by-convention client facade over the production Supabase backend.
+   Stable browser facade over the production Supabase backend.
 
-   This file contains NO authorization decisions. PostgreSQL grants, RLS and
-   RPC authorization remain the source of truth. It only gives the frontend a
-   stable contract instead of scattering raw table/RPC calls across pages.
-   Requires assets/js/store.js to be loaded first.
+   Authorization never lives here. PostgreSQL grants, RLS and RPC
+   authorization are the source of truth. No service-role worker methods are
+   exposed to browser code. Requires assets/js/store.js first.
    ═══════════════════════════════════════════════════════════════ */
 (function (global) {
   "use strict";
@@ -25,7 +24,6 @@
   async function rows(table, options) {
     const opts = options || {};
     let query = supabaseClient().from(table).select(opts.select || "*");
-
     if (Array.isArray(opts.eq)) {
       opts.eq.forEach(([column, value]) => { query = query.eq(column, value); });
     }
@@ -33,7 +31,6 @@
       query = query.order(opts.order.column, { ascending: opts.order.ascending !== false });
     }
     if (Number.isInteger(opts.limit) && opts.limit > 0) query = query.limit(opts.limit);
-
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
@@ -44,7 +41,6 @@
     const { data: auth, error: authError } = await client.auth.getUser();
     if (authError) throw authError;
     if (!auth || !auth.user) return null;
-
     const { data, error } = await client
       .from("profiles")
       .select("id,role,full_name,email,phone")
@@ -66,31 +62,51 @@
     const client = supabaseClient();
     const config = { event: "*", schema: "public", table };
     if (filter) config.filter = filter;
-
     const channel = client
       .channel(channelName(`cka-${table}`))
       .on("postgres_changes", config, callback)
       .subscribe();
-
-    return function unsubscribe() {
-      return client.removeChannel(channel);
-    };
+    return function unsubscribe() { return client.removeChannel(channel); };
   }
+
+  const notifications = {
+    list: (limit) => rows("user_notifications", {
+      order: { column: "created_at", ascending: false },
+      limit: limit || 100
+    }),
+    markRead: (notificationId) => rpc("mark_notification_read", {
+      p_notification_id: notificationId
+    }),
+    subscribe: (callback) => subscribeTo("user_notifications", callback)
+  };
 
   const Backend = {
     client: supabaseClient,
+
     auth: {
       profile: currentProfile
     },
 
+    notifications,
+
     public: {
       catalogue: () => rows("v_catalogue", {
         order: { column: "display_order", ascending: true }
+      }),
+      trackQuote: (reference, phone) => rpc("track_quote", {
+        p_reference: reference,
+        p_phone: phone
+      }),
+      trackProject: (reference, phone) => rpc("track_project", {
+        p_reference: reference,
+        p_phone: phone
       })
     },
 
     staff: {
       summary: () => rpc("staff_dashboard_summary"),
+      health: () => rpc("staff_backend_health"),
+      runMaintenance: () => rpc("staff_run_backend_maintenance"),
 
       quotes: {
         list: (limit) => rows("quotes", {
@@ -106,6 +122,10 @@
           p_status: changes && changes.status != null ? changes.status : null,
           p_assigned_to: changes && changes.assignedTo != null ? changes.assignedTo : null,
           p_internal_notes: changes && changes.internalNotes != null ? changes.internalNotes : null
+        }),
+        assign: (quoteId, profileId) => rpc("staff_assign_quote", {
+          p_quote_id: quoteId,
+          p_assigned_to: profileId == null ? null : profileId
         }),
         subscribe: (callback) => subscribeTo("quotes", callback)
       },
@@ -125,6 +145,10 @@
           p_progress_pct: changes && changes.progressPct != null ? changes.progressPct : null,
           p_assigned_to: changes && changes.assignedTo != null ? changes.assignedTo : null,
           p_notes: changes && changes.notes != null ? changes.notes : null
+        }),
+        assign: (projectId, profileId) => rpc("staff_assign_project", {
+          p_project_id: projectId,
+          p_assigned_to: profileId == null ? null : profileId
         }),
         subscribe: (callback) => subscribeTo("projects", callback)
       },
@@ -166,6 +190,9 @@
         linkAccount: (supplierId, profileId) => rpc("admin_link_supplier_account", {
           p_supplier_id: supplierId,
           p_profile_id: profileId
+        }),
+        unlinkAccount: (supplierId) => rpc("admin_unlink_supplier_account", {
+          p_supplier_id: supplierId
         })
       },
 
@@ -185,6 +212,14 @@
         })
       },
 
+      outbox: {
+        summary: () => rpc("staff_outbox_summary"),
+        list: (limit) => rows("notification_outbox", {
+          order: { column: "created_at", ascending: false },
+          limit: limit || 200
+        })
+      },
+
       audit: {
         list: (limit) => rows("admin_audit_log", {
           order: { column: "created_at", ascending: false },
@@ -195,7 +230,9 @@
           order: { column: "created_at", ascending: false },
           limit: limit || 100
         })
-      }
+      },
+
+      notifications
     },
 
     supplier: {
@@ -214,6 +251,7 @@
         const list = await rows("suppliers", { limit: 2 });
         return list.length === 1 ? list[0] : (list[0] || null);
       },
+      notifications,
       subscribeBids: (callback) => subscribeTo("supplier_bids", callback)
     },
 
@@ -227,6 +265,15 @@
         order: { column: "created_at", ascending: false },
         limit: limit || 200
       }),
+      claimQuote: (reference, phone) => rpc("customer_claim_quote", {
+        p_reference: reference,
+        p_phone: phone
+      }),
+      claimProject: (reference, phone) => rpc("customer_claim_project", {
+        p_reference: reference,
+        p_phone: phone
+      }),
+      notifications,
       subscribeQuotes: (callback) => subscribeTo("quotes", callback),
       subscribeProjects: (callback) => subscribeTo("projects", callback)
     }
