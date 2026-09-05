@@ -8,6 +8,7 @@
    - Normalise stock labels between the UI and PostgreSQL enum values.
    - Refuse product-image deletion while any database reference exists.
    - Clean up newly uploaded product images that are abandoned before save.
+   - Persist extended editor fields only when the live schema supports them.
    - Replace the legacy destructive-delete warning with a live DB warning.
 
    This file deliberately does not create a second Supabase client.
@@ -20,6 +21,7 @@
   const client = STORE && STORE.supabase;
   const bucket = CONFIG.storageBucket || "project-uploads";
   const pendingUploads = new Map(); // public URL -> storage path
+  let extendedProductFields = false;
 
   if (!STORE || !client) {
     console.error("CKA ADMIN: Supabase store/client is unavailable.");
@@ -69,6 +71,59 @@
       discard.hidden = true;
       banner.appendChild(discard);
     }
+  }
+
+  function parseSpecs(value) {
+    if (!value) return {};
+    if (typeof value === "object" && !Array.isArray(value)) return value;
+
+    return String(value)
+      .split(";")
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .reduce((out, part) => {
+        const idx = part.indexOf(":");
+        if (idx === -1) return out;
+        const key = part.slice(0, idx).trim();
+        const val = part.slice(idx + 1).trim();
+        if (key) out[key] = val;
+        return out;
+      }, {});
+  }
+
+  function parseRange(value) {
+    const nums = String(value || "")
+      .replace(/,/g, "")
+      .match(/\d+(?:\.\d+)?/g);
+
+    if (!nums || nums.length < 2) return { price_min: null, price_max: null };
+
+    const a = Number(nums[0]);
+    const b = Number(nums[1]);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return { price_min: null, price_max: null };
+
+    return { price_min: Math.min(a, b), price_max: Math.max(a, b) };
+  }
+
+  async function detectExtendedProductFields() {
+    const { error } = await client
+      .from("products")
+      .select("id,grade,size,badge,rating,specifications,price_min,price_max")
+      .limit(1);
+
+    extendedProductFields = !error;
+
+    if (error) {
+      console.warn(
+        "CKA ADMIN: extended product columns are not available yet; " +
+        "base product saving remains enabled until the reconciliation migration is applied.",
+        error
+      );
+    } else {
+      console.log("CKA ADMIN: extended product fields detected");
+    }
+
+    return extendedProductFields;
   }
 
   function publicUrlForPath(path) {
@@ -200,13 +255,12 @@
         pendingUploads.delete(url);
         console.log("CKA ORPHAN IMAGE REMOVED:", path);
       } catch (err) {
-        // Reference-check failures deliberately leave the object in place.
         console.warn("CKA ORPHAN IMAGE CLEANUP SKIPPED:", path, err);
       }
     }
   }
 
-  function installStockNormalisation() {
+  function installProductPersistence() {
     const rawList = STORE.products.list.bind(STORE.products);
     const rawSave = STORE.products.save.bind(STORE.products);
 
@@ -225,10 +279,30 @@
       };
 
       const saved = await rawSave(p);
-      const savedImage = Array.isArray(product.images) ? product.images[0] || "" : "";
+      const savedId = saved?.id || product.id;
 
-      // Once the DB save succeeds, the saved image is no longer an orphan;
-      // any earlier uploads from the same editor session can be removed.
+      if (extendedProductFields && savedId) {
+        const range = parseRange(product.range);
+        const { error } = await client
+          .from("products")
+          .update({
+            grade: product.grade || null,
+            size: product.size || null,
+            badge: product.badge || null,
+            rating: Number(product.rating) || null,
+            specifications: parseSpecs(product.specs),
+            price_min: range.price_min,
+            price_max: range.price_max
+          })
+          .eq("id", savedId);
+
+        if (error) {
+          console.error("CKA ADMIN: extended product field save failed", error);
+          throw error;
+        }
+      }
+
+      const savedImage = Array.isArray(product.images) ? product.images[0] || "" : "";
       await cleanupPendingUploads(savedImage);
       return saved;
     };
@@ -321,7 +395,8 @@
       ensureLegacyHooks();
       installStorageSafety();
       installUploadTracking();
-      installStockNormalisation();
+      await detectExtendedProductFields();
+      installProductPersistence();
 
       document.body.style.visibility = "visible";
       await loadAdminScript();
@@ -333,6 +408,7 @@
         findImageReferences,
         cleanupPendingUploads,
         pendingUploads,
+        extendedProductFields,
         stockToDb: STOCK_TO_DB,
         stockToUi: STOCK_TO_UI
       };
