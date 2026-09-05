@@ -50,8 +50,6 @@
     const images = [mainImage, ...gallery.filter((url) => url !== mainImage)];
 
     return {
-      // app.js historically coerces data-* IDs with unary +. Derive a stable,
-      // safe integer from the immutable product UUID and carry the UUID as dbId.
       id: stableUiId(row.id),
       dbId: row.id,
       sku: row.sku || "",
@@ -109,11 +107,7 @@
       }
 
       if (product.dbId) {
-        return {
-          product_id: product.dbId,
-          variant_id: null,
-          quantity
-        };
+        return { product_id: product.dbId, variant_id: null, quantity };
       }
 
       return {
@@ -191,9 +185,7 @@
         console.error("CKA QUOTE SUBMIT FAILED:", err);
         button.disabled = false;
         button.innerHTML = originalHtml;
-        showCheckoutError(err && err.message
-          ? err.message
-          : "Could not submit the quotation request. Please try again or contact CKA on WhatsApp.");
+        showCheckoutError(err && err.message ? err.message : "Could not submit the quotation request. Please try again or contact CKA on WhatsApp.");
       } finally {
         submitting = false;
         allowExistingSuccessHandler = false;
@@ -201,15 +193,23 @@
     }, true);
   }
 
+  function loadMaterialDetailLinks() {
+    if (!document.getElementById("product-grid") || document.querySelector('script[src*="material-card-links.js"]')) return;
+    const details = document.createElement("script");
+    details.src = "assets/js/material-card-links.js?v=1";
+    details.async = true;
+    details.onerror = () => console.warn("CKA PUBLIC: material detail navigation failed to load");
+    document.body.appendChild(details);
+  }
+
   function startApplication(client) {
     const script = document.createElement("script");
     script.src = "assets/js/app.js?v=27";
     script.defer = false;
-    script.onerror = function () {
-      console.error("CKA PUBLIC: app.js failed to load");
-    };
+    script.onerror = function () { console.error("CKA PUBLIC: app.js failed to load"); };
     script.onload = function () {
       installRealCheckout(client);
+      loadMaterialDetailLinks();
     };
     document.body.appendChild(script);
   }
@@ -232,13 +232,8 @@
         throw new Error("Live catalogue returned no usable products");
       }
 
-      const live = data
-        .map(toProduct)
-        .filter((product) => product.dbId && product.title && product.category);
-
-      if (live.length < MIN_EXPECTED_PRODUCTS) {
-        throw new Error("Live catalogue rows failed validation");
-      }
+      const live = data.map(toProduct).filter((product) => product.dbId && product.title && product.category);
+      if (live.length < MIN_EXPECTED_PRODUCTS) throw new Error("Live catalogue rows failed validation");
 
       const ids = new Set();
       for (const product of live) {
