@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="robots" content="noindex,nofollow" />
+<title>CKA BuildStruct — Supplier Portal</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/portal.css?v=1" />
+</head>
+<body class="portal" style="visibility:hidden">
+<div class="portal__shell">
+  <aside class="portal__side">
+    <a class="portal__brand" href="index.html"><img src="assets/img/logo-mark.png" alt="" /><div><strong>CKA BuildStruct</strong><span>Supplier Procurement Portal</span></div></a>
+    <nav class="portal__nav" aria-label="Supplier sections">
+      <button class="is-active" data-view="overview">Overview</button>
+      <button data-view="tenders">Open tenders <span id="supplier-tender-count"></span></button>
+      <button data-view="bids">My bid history</button>
+      <button data-view="notifications">Notifications <span id="supplier-unread"></span></button>
+      <button data-view="profile">Supplier profile</button>
+    </nav>
+    <div class="portal__sidefoot">Tenders expose procurement requirements only. Customer contact details and delivery addresses remain private. All bid revisions are retained for audit.</div>
+  </aside>
+
+  <main class="portal__main">
+    <header class="portal__top"><div class="portal__identity"><strong id="supplier-name">Supplier</strong><span id="supplier-meta">Verified procurement access</span></div><div class="portal__actions"><button class="portal__btn" id="supplier-refresh">Refresh</button><button class="portal__btn" id="supplier-signout">Sign out</button></div></header>
+
+    <section class="portal__view is-active" data-view="overview"><div class="portal__head"><div><h1>Supplier overview</h1><p>Review open CKA tenders, submit itemized offers and track your commercial revisions.</p></div></div><div class="portal__grid" id="supplier-kpis"></div><div class="portal__grid" style="margin-top:14px"><article class="portal__card"><h3>Next tender deadlines</h3><div id="supplier-deadlines"></div></article><article class="portal__card"><h3>Recent bid activity</h3><div id="supplier-recent-bids"></div></article></div></section>
+
+    <section class="portal__view" data-view="tenders"><div class="portal__head"><div><h1>Open tenders</h1><p>Only verified supplier accounts can see this sanitized procurement feed. Pricing is submitted per quotation line and totals are computed by the database.</p></div></div><div class="portal__grid" id="supplier-tenders"></div><p class="portal__empty" id="supplier-tenders-empty" hidden>No CKA tenders are currently open for bidding.</p></section>
+
+    <section class="portal__view" data-view="bids"><div class="portal__head"><div><h1>My bid history</h1><p>Every revision is retained. The latest revision is used by CKA for commercial comparison unless it has been withdrawn.</p></div></div><div class="portal__tablewrap"><table class="portal__table"><thead><tr><th>Placed</th><th>Revision</th><th>Total</th><th>Delivery</th><th>Valid until</th><th>Status</th><th></th></tr></thead><tbody id="supplier-bid-rows"></tbody></table><p class="portal__empty" id="supplier-bids-empty" hidden>No bids submitted yet.</p></div></section>
+
+    <section class="portal__view" data-view="notifications"><div class="portal__head"><div><h1>Notifications</h1><p>New tenders, award decisions and supplier-account events.</p></div><button class="portal__btn" id="supplier-mark-read">Mark visible as read</button></div><div class="portal__card"><ul class="portal__list" id="supplier-notifications"></ul><p class="portal__empty" id="supplier-notifications-empty" hidden>No notifications yet.</p></div></section>
+
+    <section class="portal__view" data-view="profile"><div class="portal__head"><div><h1>Supplier profile</h1><p>Verification and reliability information maintained by CKA operations.</p></div></div><div class="portal__grid" id="supplier-profile-grid"></div><div class="portal__notice" style="margin-top:14px">Supplier verification, reliability score and account linking are controlled by CKA administrators. Contact CKA if business contact information needs correction.</div></section>
+  </main>
+</div>
+
+<div class="portal__drawerwrap" id="supplier-drawer" aria-hidden="true"><div class="portal__overlay" data-close-drawer></div><aside class="portal__drawer"><header class="portal__drawerhead"><div><small>Procurement tender</small><h2 id="supplier-drawer-title">Tender</h2></div><button class="portal__btn" data-close-drawer>Close</button></header><div class="portal__drawerbody" id="supplier-drawer-body"></div><footer class="portal__drawerfoot" id="supplier-drawer-foot"></footer></aside></div>
+<div class="portal__toastbox" id="portal-toasts" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/data.js?v=20"></script>
+<script src="assets/js/store.js?v=25"></script>
+<script src="assets/js/backend-api.js?v=3"></script>
+<script src="assets/js/supplier-portal.js?v=1"></script>
+</body>
+</html>
