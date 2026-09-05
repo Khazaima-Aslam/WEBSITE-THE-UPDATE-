@@ -58,7 +58,7 @@
     } else {
       const src = (navigator.connection && navigator.connection.saveData) || mq("(max-width: 700px)")
         ? "540" : "720";
-      heroVideo.src = "assets/video/hero-" + src + ".mp4";
+      heroVideo.src = "assets/video/hero-architecture-v2-" + src + ".mp4";
       try { const p = heroVideo.play && heroVideo.play(); if (p && p.catch) p.catch(turnOff); } catch (e) { turnOff(); }
 
     }
