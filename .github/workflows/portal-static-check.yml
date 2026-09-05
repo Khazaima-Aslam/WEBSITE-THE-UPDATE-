@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [customer-supplier-bidding-portals, catalogue-admin-completion, material-detail-payment-verification]
+    branches: [customer-supplier-bidding-portals, catalogue-admin-completion, material-detail-payment-verification, apple-premium-public-redesign]
 
 permissions:
   contents: read
@@ -18,6 +18,7 @@ jobs:
 
       - name: JavaScript syntax
         run: |
+          node --check assets/js/store.js
           node --check assets/js/backend-api.js
           node --check assets/js/account.js
           node --check assets/js/customer-portal.js
@@ -45,6 +46,8 @@ jobs:
             assets/css/portal.css \
             assets/css/admin-catalogue-pro.css \
             assets/css/product-detail.css \
+            assets/css/apple-premium.css \
+            assets/js/store.js \
             assets/js/backend-api.js \
             assets/js/account.js \
             assets/js/customer-portal.js \
@@ -78,6 +81,18 @@ jobs:
           grep -q 'admin-runtime.js?v=2' admin.html
           grep -q 'admin-catalogue-pro.css' admin.html
           grep -q 'admin-catalogue-pro.js?v=1' assets/js/admin-runtime.js
+
+      - name: Premium public theme isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'apple-premium.css?v=1' assets/js/store.js
+          grep -q 'classList.contains("adm")' assets/js/store.js
+          grep -q 'classList.contains("portal")' assets/js/store.js
+          grep -q -- '--gold-strong:#0066cc' assets/css/apple-premium.css
+          grep -q 'height:44px' assets/css/apple-premium.css
+          grep -q 'height:52px' assets/css/apple-premium.css
+          grep -q 'backdrop-filter:saturate(180%) blur(20px)' assets/css/apple-premium.css
 
       - name: Migration records
         shell: bash
