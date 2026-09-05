@@ -19,6 +19,7 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check assets/js/store.js
+          node --check assets/js/public-forms.js
           node --check assets/js/backend-api.js
           node --check assets/js/account.js
           node --check assets/js/customer-portal.js
@@ -47,7 +48,10 @@ jobs:
             assets/css/admin-catalogue-pro.css \
             assets/css/product-detail.css \
             assets/css/apple-premium.css \
+            assets/video/hero-720.mp4 \
+            assets/video/hero-540.mp4 \
             assets/js/store.js \
+            assets/js/public-forms.js \
             assets/js/backend-api.js \
             assets/js/account.js \
             assets/js/customer-portal.js \
@@ -82,17 +86,20 @@ jobs:
           grep -q 'admin-catalogue-pro.css' admin.html
           grep -q 'admin-catalogue-pro.js?v=1' assets/js/admin-runtime.js
 
-      - name: Premium public theme isolation
+      - name: Premium navigation and hero scope
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'apple-premium.css?v=1' assets/js/store.js
           grep -q 'classList.contains("adm")' assets/js/store.js
           grep -q 'classList.contains("portal")' assets/js/store.js
-          grep -q -- '--gold-strong:#0066cc' assets/css/apple-premium.css
+          grep -q -- '--font-d:-apple-system' assets/css/apple-premium.css
           grep -q 'height:44px' assets/css/apple-premium.css
           grep -q 'height:52px' assets/css/apple-premium.css
           grep -q 'backdrop-filter:saturate(180%) blur(20px)' assets/css/apple-premium.css
+          grep -q 'Build with confidence.' assets/js/public-forms.js
+          test "$(stat -c%s assets/video/hero-720.mp4)" -gt 500000
+          cmp -s assets/video/hero-720.mp4 assets/video/hero-540.mp4
 
       - name: Migration records
         shell: bash
