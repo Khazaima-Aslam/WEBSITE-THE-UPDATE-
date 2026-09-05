@@ -41,6 +41,34 @@
     rate_on_request: "Rate on request"
   };
 
+  function ensureLegacyHooks() {
+    const banner = document.getElementById("draft-banner");
+    if (!banner) return;
+
+    if (!document.getElementById("draft-count")) {
+      const count = document.createElement("span");
+      count.id = "draft-count";
+      count.hidden = true;
+      banner.appendChild(count);
+    }
+
+    if (!document.getElementById("go-publish")) {
+      const go = document.createElement("button");
+      go.id = "go-publish";
+      go.type = "button";
+      go.hidden = true;
+      banner.appendChild(go);
+    }
+
+    if (!document.getElementById("discard-draft")) {
+      const discard = document.createElement("button");
+      discard.id = "discard-draft";
+      discard.type = "button";
+      discard.hidden = true;
+      banner.appendChild(discard);
+    }
+  }
+
   function installStockNormalisation() {
     const rawList = STORE.products.list.bind(STORE.products);
     const rawSave = STORE.products.save.bind(STORE.products);
@@ -75,12 +103,11 @@
 
     const references = [];
 
-    // The live project currently uses products.image_url.
     const productsCheck = await client
       .from("products")
       .select("id,name,image_url")
       .eq("image_url", url)
-      .limit(5);
+      .limit(10);
 
     if (productsCheck.error) {
       console.warn("CKA IMAGE SAFETY: products.image_url check failed; deletion blocked.", productsCheck.error);
@@ -93,13 +120,11 @@
       productName: row.name || ""
     }));
 
-    // The repository schema also contains product_images. During migration,
-    // either model may still contain a valid reference, so both must be checked.
     const galleryCheck = await client
       .from("product_images")
       .select("product_id,url")
       .eq("url", url)
-      .limit(5);
+      .limit(10);
 
     if (galleryCheck.error) {
       console.warn("CKA IMAGE SAFETY: product_images check failed; deletion blocked.", galleryCheck.error);
@@ -127,8 +152,6 @@
     STORE.files.remove = async function (path) {
       if (!path) return [];
 
-      // Apply the reference gate to product images. Other project files keep
-      // their existing lifecycle until their own management UI is implemented.
       if (!String(path).startsWith("product-images/")) {
         return rawRemove(path);
       }
@@ -137,12 +160,11 @@
       console.log("CKA IMAGE DELETE SAFETY CHECK:", { path, ...check });
 
       if (!check.safe) {
-        console.warn("CKA IMAGE DELETE SKIPPED:", path, check.reason, check.references);
-        return {
-          skipped: true,
-          reason: check.reason,
-          references: check.references
-        };
+        const err = new Error(`Product image deletion blocked: ${check.reason}`);
+        err.code = "CKA_IMAGE_DELETE_BLOCKED";
+        err.references = check.references;
+        console.warn("CKA IMAGE DELETE BLOCKED:", path, check.reason, check.references);
+        throw err;
       }
 
       return rawRemove(path);
@@ -165,11 +187,7 @@
       .eq("id", data.user.id)
       .single();
 
-    if (
-      profileError ||
-      !profile ||
-      !["admin", "staff"].includes(profile.role)
-    ) {
+    if (profileError || !profile || !["admin", "staff"].includes(profile.role)) {
       await client.auth.signOut();
       global.location.replace("admin-login.html");
       return null;
@@ -183,7 +201,6 @@
     const rows = document.getElementById("adm-rows");
     if (!rows) return;
 
-    // Capture phase runs before the legacy delegated delete handler in admin.js.
     rows.addEventListener("click", async function (event) {
       const button = event.target.closest("[data-del]");
       if (!button) return;
@@ -230,6 +247,7 @@
       const user = await requireAdminAuth();
       if (!user) return;
 
+      ensureLegacyHooks();
       installStockNormalisation();
       installStorageSafety();
 
