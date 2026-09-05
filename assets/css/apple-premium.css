@@ -112,6 +112,15 @@ h1 em,h2 em{
   line-height:1.5;
 }
 
+/* Live project sites: force the verified, cache-safe house collage. */
+#showcase .showcase-tile--lg{
+  background:#111 url("../img/live-project-homes-final.webp") center/cover no-repeat;
+}
+#showcase .showcase-tile--lg > img{
+  opacity:0;
+  pointer-events:none;
+}
+
 @media (max-width:833px){
   .topbar{height:36px;}
   .topbar__in{min-height:36px;font-size:11px;}
