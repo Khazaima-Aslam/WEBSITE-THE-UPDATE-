@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [customer-supplier-bidding-portals, catalogue-admin-completion]
+    branches: [customer-supplier-bidding-portals, catalogue-admin-completion, material-detail-payment-verification]
 
 permissions:
   contents: read
@@ -26,6 +26,11 @@ jobs:
           node --check assets/js/admin-supplier-accounts.js
           node --check assets/js/admin-runtime.js
           node --check assets/js/admin-catalogue-pro.js
+          node --check assets/js/public-catalogue.js
+          node --check assets/js/material-card-links.js
+          node --check assets/js/product-detail.js
+          node --check assets/js/customer-payments.js
+          node --check assets/js/admin-payments.js
 
       - name: Required production assets
         shell: bash
@@ -36,8 +41,10 @@ jobs:
             customer-portal.html \
             supplier-portal.html \
             admin.html \
+            product.html \
             assets/css/portal.css \
             assets/css/admin-catalogue-pro.css \
+            assets/css/product-detail.css \
             assets/js/backend-api.js \
             assets/js/account.js \
             assets/js/customer-portal.js \
@@ -45,7 +52,12 @@ jobs:
             assets/js/admin-bidding.js \
             assets/js/admin-supplier-accounts.js \
             assets/js/admin-runtime.js \
-            assets/js/admin-catalogue-pro.js; do
+            assets/js/admin-catalogue-pro.js \
+            assets/js/public-catalogue.js \
+            assets/js/material-card-links.js \
+            assets/js/product-detail.js \
+            assets/js/customer-payments.js \
+            assets/js/admin-payments.js; do
             test -s "$file" || { echo "Missing or empty: $file"; exit 1; }
           done
 
@@ -55,10 +67,14 @@ jobs:
           set -euo pipefail
           grep -q 'assets/js/account.js' account.html
           grep -q 'assets/js/customer-portal.js' customer-portal.html
+          grep -q 'assets/js/customer-payments.js' customer-portal.html
           grep -q 'assets/js/supplier-portal.js' supplier-portal.html
           grep -q 'account.html' suppliers.html
           grep -q 'admin-bidding.js' assets/js/backend-api.js
           grep -q 'admin-supplier-accounts.js' assets/js/admin-bidding.js
+          grep -q 'admin-payments.js' assets/js/admin-bidding.js
+          grep -q 'material-card-links.js' assets/js/public-catalogue.js
+          grep -q 'assets/js/product-detail.js' product.html
           grep -q 'admin-runtime.js?v=2' admin.html
           grep -q 'admin-catalogue-pro.css' admin.html
           grep -q 'admin-catalogue-pro.js?v=1' assets/js/admin-runtime.js
@@ -78,7 +94,9 @@ jobs:
             20260905130020_index_quotes_awarded_bid.sql \
             20260905135551_catalogue_admin_atomic_product_and_category_management.sql \
             20260905135648_catalogue_admin_full_product_read.sql \
-            20260905140033_catalogue_admin_atomic_batch_import.sql; do
+            20260905140033_catalogue_admin_atomic_batch_import.sql \
+            20260905152844_quote_payment_proof_verification.sql \
+            20260905153644_allow_rejected_payment_proof_resubmission.sql; do
             test -s "db/migrations/$migration" || { echo "Missing migration: $migration"; exit 1; }
           done
 
@@ -92,3 +110,14 @@ jobs:
           grep -q 'staff_save_category' assets/js/admin-catalogue-pro.js
           grep -q 'staff_delete_category' assets/js/admin-catalogue-pro.js
           grep -q 'staff_import_catalogue_products' assets/js/admin-catalogue-pro.js
+
+      - name: Payment verification references
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'customer_payment_overview' assets/js/customer-payments.js
+          grep -q 'customer_submit_payment' assets/js/customer-payments.js
+          grep -q 'staff_quote_payment_overview' assets/js/admin-payments.js
+          grep -q 'staff_review_payment' assets/js/admin-payments.js
+          grep -q 'payment-proofs' assets/js/customer-payments.js
+          grep -q 'product.html?id=' assets/js/material-card-links.js
