@@ -12,6 +12,19 @@
 
   if (!api || !client) return;
 
+  if (!document.querySelector('link[href*="assets/css/portal.css"]')) {
+    const css = document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = "assets/css/portal.css?v=1";
+    document.head.appendChild(css);
+  }
+  if (!document.querySelector('script[src*="admin-supplier-accounts.js"]')) {
+    const supplierAccounts = document.createElement("script");
+    supplierAccounts.src = "assets/js/admin-supplier-accounts.js?v=1";
+    supplierAccounts.async = true;
+    document.head.appendChild(supplierAccounts);
+  }
+
   function toLocalInput(value) {
     const d = value ? new Date(value) : new Date(Date.now() + 48 * 3600000);
     const offset = d.getTimezoneOffset();
