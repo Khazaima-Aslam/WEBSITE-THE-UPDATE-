@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="robots" content="noindex,follow" />
+<title>CKA BuildStruct — Account</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/portal.css?v=1" />
+</head>
+<body class="portal">
+<div class="portal__auth">
+  <section class="portal__auth-hero">
+    <a class="portal__brand" href="index.html"><img src="assets/img/logo-mark.png" alt="" /><div><strong>CKA BuildStruct</strong><span>Customer & supplier access</span></div></a>
+    <div style="margin-top:auto"><h1>One account for requests, projects and procurement.</h1><p>Customers can manage quotation and project activity in one place. Verified suppliers receive controlled access to live CKA tenders and can submit itemized commercial bids.</p></div>
+  </section>
+
+  <main class="portal__auth-panel">
+    <h2>Secure account access</h2>
+    <p>Sign in to your approved CKA role or create a customer account.</p>
+
+    <div class="portal__tabs" role="tablist" aria-label="Account actions">
+      <button class="is-active" type="button" data-auth-tab="signin">Sign in</button>
+      <button type="button" data-auth-tab="register">Create customer account</button>
+    </div>
+
+    <form id="signin-form" class="portal__authform is-active" novalidate>
+      <div class="portal__field"><span>Email</span><input class="portal__input" name="email" type="email" autocomplete="username" required /></div>
+      <div class="portal__field" style="margin-top:12px"><span>Password</span><input class="portal__input" name="password" type="password" autocomplete="current-password" required minlength="8" /></div>
+      <button class="portal__btn portal__btn--primary" type="submit" style="width:100%;margin-top:16px">Sign in</button>
+      <p class="portal__meta">Supplier access is not self-assigned. A supplier login must be linked by CKA to an already verified supplier record.</p>
+    </form>
+
+    <form id="register-form" class="portal__authform" novalidate>
+      <div class="portal__formgrid">
+        <div class="portal__field portal__wide"><span>Full name</span><input class="portal__input" name="full_name" autocomplete="name" required maxlength="120" /></div>
+        <div class="portal__field"><span>Email</span><input class="portal__input" name="email" type="email" autocomplete="email" required maxlength="160" /></div>
+        <div class="portal__field"><span>Phone</span><input class="portal__input" name="phone" autocomplete="tel" maxlength="40" /></div>
+        <div class="portal__field portal__wide"><span>Password</span><input class="portal__input" name="password" type="password" autocomplete="new-password" required minlength="8" /></div>
+      </div>
+      <button class="portal__btn portal__btn--primary" type="submit" style="width:100%;margin-top:16px">Create customer account</button>
+      <p class="portal__meta">After registration you can claim earlier guest quotation/project references using the same phone number used on those requests.</p>
+    </form>
+
+    <div id="account-message" class="portal__message" role="status" aria-live="polite"></div>
+    <div class="portal__notice" style="margin-top:18px"><strong>Supplier?</strong> Apply through the supplier registration page first. Once CKA verifies your business and links a dedicated login, this same sign-in page routes you to the supplier tender portal.</div>
+    <p class="portal__meta" style="margin-top:18px"><a href="index.html">← Back to CKA BuildStruct</a> &nbsp;·&nbsp; <a href="suppliers.html">Supplier registration</a></p>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/data.js?v=20"></script>
+<script src="assets/js/store.js?v=25"></script>
+<script src="assets/js/backend-api.js?v=3"></script>
+<script src="assets/js/account.js?v=1"></script>
+</body>
+</html>
