@@ -1,0 +1,130 @@
+/* CKA BuildStruct — premium navigation + typography refinement
+   User-approved scope: keep the compact Apple-inspired toolbar/navigation
+   and cleaner text treatment while preserving CKA's existing page colors,
+   cards, buttons, forms, sections, footer and operational styling.
+   Final supplied architectural hero media is self-hosted in the local hero slots. */
+
+:root{
+  --head-h:52px;
+  --font-d:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",system-ui,sans-serif;
+  --font-b:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",system-ui,sans-serif;
+}
+
+/* Cleaner editorial typography without changing CKA's color system. */
+body{
+  font-family:var(--font-b);
+  font-size:17px;
+  line-height:1.47;
+  letter-spacing:-.008em;
+}
+
+h1,h2,h3,h4{
+  font-family:var(--font-d);
+  font-weight:600;
+  letter-spacing:-.018em;
+}
+h1{line-height:1.07;}
+h2{line-height:1.10;}
+h3,h4{line-height:1.20;}
+h1 em,h2 em{
+  font-family:inherit;
+  font-style:normal;
+  font-weight:600;
+  letter-spacing:inherit;
+}
+.lead{line-height:1.5;}
+
+/* Compact black information bar. */
+.topbar{
+  height:44px;
+  display:flex;
+  align-items:center;
+  background:#000;
+  color:#f5f5f7;
+  border:0;
+  font-size:12px;
+  letter-spacing:-.01em;
+}
+.topbar__in{
+  width:100%;
+  min-height:44px;
+  padding:0;
+}
+.topbar__right{gap:18px;}
+.topbar a{
+  color:#f5f5f7;
+  font-weight:400;
+  opacity:.9;
+}
+.topbar a:hover{color:#fff;opacity:1;}
+
+/* Thin frosted primary navigation. */
+.header{
+  top:0;
+  background:rgba(248,247,244,.84);
+  border-bottom:1px solid rgba(22,27,38,.09);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  box-shadow:none;
+}
+.header__in{
+  height:52px;
+  gap:18px;
+}
+.brand{gap:8px;}
+.brand__logo{height:30px;}
+.brand__txt{
+  font-family:var(--font-d);
+  font-size:15px;
+  letter-spacing:-.01em;
+  gap:.28em;
+}
+.brand__txt b{font-weight:600;}
+.brand__txt i{font-weight:400;}
+.nav{gap:1px;}
+.nav__link{
+  padding:8px 10px;
+  border-radius:8px;
+  font-size:12px;
+  line-height:1;
+  font-weight:400;
+  letter-spacing:-.01em;
+}
+.nav__link.is-active{font-weight:600;}
+.header__actions{gap:8px;}
+.cart-btn,.menu-btn{
+  width:38px;
+  height:38px;
+  border-radius:999px;
+}
+
+/* Keep the premium hero type treatment, not the previous full-site recolor. */
+.hero h1{
+  font-family:var(--font-d);
+  font-size:clamp(2.6rem,5.2vw,3.5rem);
+  font-weight:600;
+  line-height:1.07;
+  letter-spacing:-.025em;
+  max-width:900px;
+}
+.hero .lead{
+  font-size:clamp(1.08rem,1.5vw,1.3rem);
+  line-height:1.5;
+}
+
+@media (max-width:833px){
+  .topbar{height:36px;}
+  .topbar__in{min-height:36px;font-size:11px;}
+  .topbar__right{display:none;}
+  .header__in{height:52px;}
+  .brand__logo{height:28px;}
+  .brand__txt{font-size:14px;}
+}
+
+@media (max-width:640px){
+  .hero h1{font-size:34px;}
+}
+
+@media (max-width:419px){
+  .hero h1{font-size:28px;}
+}

@@ -315,6 +315,19 @@
   active.createSupabaseStore = createSupabaseStore;
   global.CKAStore = active;
 
+  // Public marketing surfaces use one shared premium theme. Keep admin and
+  // authenticated portal workspaces isolated so operational UI cannot drift.
+  if (global.document && global.document.head && global.document.body &&
+      !global.document.body.classList.contains("adm") &&
+      !global.document.body.classList.contains("portal") &&
+      !global.document.querySelector('link[data-cka-premium-theme]')) {
+    const theme = global.document.createElement("link");
+    theme.rel = "stylesheet";
+    theme.href = "assets/css/apple-premium.css?v=1";
+    theme.dataset.ckaPremiumTheme = "true";
+    global.document.head.appendChild(theme);
+  }
+
   // Public pages share supplier registration and footer subscription handlers.
   // Load once from the data layer so identical forms cannot drift page-by-page.
   if (sb && global.document && global.document.body && !global.document.body.classList.contains("adm")) {
