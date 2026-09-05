@@ -50,6 +50,8 @@ jobs:
             assets/css/apple-premium.css \
             assets/video/hero-720.mp4 \
             assets/video/hero-540.mp4 \
+            assets/video/design-720.mp4 \
+            assets/video/design-360.mp4 \
             assets/js/store.js \
             assets/js/public-forms.js \
             assets/js/backend-api.js \
@@ -98,8 +100,10 @@ jobs:
           grep -q 'height:52px' assets/css/apple-premium.css
           grep -q 'backdrop-filter:saturate(180%) blur(20px)' assets/css/apple-premium.css
           grep -q 'Build with confidence.' assets/js/public-forms.js
-          test "$(stat -c%s assets/video/hero-720.mp4)" -gt 500000
-          cmp -s assets/video/hero-720.mp4 assets/video/hero-540.mp4
+          grep -q 'assets/video/design-720.mp4' assets/js/public-forms.js
+          grep -q 'assets/video/design-360.mp4' assets/js/public-forms.js
+          test "$(stat -c%s assets/video/design-720.mp4)" -gt 1000000
+          test "$(stat -c%s assets/video/design-360.mp4)" -gt 250000
 
       - name: Migration records
         shell: bash
