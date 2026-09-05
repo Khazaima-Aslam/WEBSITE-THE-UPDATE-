@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>CKA BuildStruct — Operations Console</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/styles.css?v=20" />
+<link rel="stylesheet" href="assets/css/admin.css?v=20" />
+<link rel="stylesheet" href="assets/css/admin-operations.css?v=1" />
+</head>
+<body class="adm ops" style="visibility:hidden">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v11h14V10"/><path d="M9 21v-6h6v6"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></symbol>
+  <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M4 4h16l2 9v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-7Z"/><path d="M2 13h6l2 3h4l2-3h6"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M10 17h4V5H2v12h3"/><path d="M14 9h4l4 4v4h-3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l2-8 4 16 2-8h6"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8v8a2 2 0 0 1-1 1.73l-7 4a2 2 0 0 1-2 0l-7-4A2 2 0 0 1 3 16V8a2 2 0 0 1 1-1.73l7-4a2 2 0 0 1 2 0l7 4A2 2 0 0 1 21 8z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 6v6h-6"/><path d="M4 18v-6h6"/><path d="M18.5 9a7 7 0 0 0-11.8-3L4 9m16 6-2.7 3a7 7 0 0 1-11.8-3"/></symbol>
+  <symbol id="i-log-out" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 19V5a2 2 0 0 0-2-2h-6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></symbol>
+</defs></svg>
+
+<div class="adm__shell">
+  <aside class="adm__side">
+    <a class="adm__brand" href="index.html">
+      <img src="assets/img/logo-mark.png" alt="" width="200" height="200" />
+      <span class="brand__txt"><b>CKA</b><i>Operations</i></span>
+    </a>
+
+    <nav class="adm__nav" aria-label="Operations sections">
+      <button class="adm__navlink is-active" data-view="overview"><svg class="ic"><use href="#i-home"/></svg>Overview</button>
+      <button class="adm__navlink" data-view="quotes"><svg class="ic"><use href="#i-file"/></svg>Quotations <span class="ops__navcount" id="nav-quotes"></span></button>
+      <button class="adm__navlink" data-view="projects"><svg class="ic"><use href="#i-briefcase"/></svg>Projects <span class="ops__navcount" id="nav-projects"></span></button>
+      <button class="adm__navlink" data-view="inquiries"><svg class="ic"><use href="#i-inbox"/></svg>Inquiries <span class="ops__navcount" id="nav-inquiries"></span></button>
+      <button class="adm__navlink" data-view="applications"><svg class="ic"><use href="#i-users"/></svg>Supplier applications <span class="ops__navcount" id="nav-applications"></span></button>
+      <button class="adm__navlink" data-view="suppliers"><svg class="ic"><use href="#i-truck"/></svg>Suppliers</button>
+      <button class="adm__navlink" data-view="notifications"><svg class="ic"><use href="#i-bell"/></svg>Notifications <span class="ops__navcount" id="nav-notifications"></span></button>
+      <button class="adm__navlink" data-view="system"><svg class="ic"><use href="#i-activity"/></svg>System &amp; audit</button>
+      <a class="adm__navlink ops__nav-separator" href="admin.html"><svg class="ic"><use href="#i-box"/></svg>Catalogue manager</a>
+    </nav>
+
+    <p class="adm__mode">
+      <span class="chip chip--info">Live Supabase</span>
+      Workflow controls, RLS and audit rules are enforced by PostgreSQL.
+    </p>
+  </aside>
+
+  <main class="adm__main ops__main">
+    <header class="ops__topbar">
+      <div>
+        <strong id="ops-user-name">Operations Console</strong>
+        <span id="ops-user-role">Checking access…</span>
+      </div>
+      <div class="ops__topacts">
+        <span class="ops__sync" id="ops-sync">Not synced yet</span>
+        <button class="btn btn--ghost btn--sm" id="ops-refresh"><svg class="ic"><use href="#i-refresh"/></svg>Refresh</button>
+        <button class="btn btn--ghost btn--sm" id="ops-signout"><svg class="ic"><use href="#i-log-out"/></svg>Sign out</button>
+      </div>
+    </header>
+
+    <section class="adm__view is-active" data-view="overview">
+      <header class="adm__head">
+        <div><h1>Operations overview</h1><p>Live work queues, supplier readiness and backend health.</p></div>
+      </header>
+      <div class="ops__kpis" id="ops-kpis"></div>
+      <div class="ops__overview-grid">
+        <article class="adm__card ops__queue"><header><div><h3>Quotation queue</h3><p>Requests needing commercial action.</p></div><button class="ops__textbtn" data-open-view="quotes">Open quotations</button></header><div id="overview-quotes"></div></article>
+        <article class="adm__card ops__queue"><header><div><h3>Project queue</h3><p>Design, BOQ and delivery engagements.</p></div><button class="ops__textbtn" data-open-view="projects">Open projects</button></header><div id="overview-projects"></div></article>
+        <article class="adm__card ops__queue"><header><div><h3>Customer inquiries</h3><p>Unresolved contact requests.</p></div><button class="ops__textbtn" data-open-view="inquiries">Open inquiries</button></header><div id="overview-inquiries"></div></article>
+        <article class="adm__card ops__queue"><header><div><h3>Supplier onboarding</h3><p>Applications waiting for review.</p></div><button class="ops__textbtn" data-open-view="applications">Open applications</button></header><div id="overview-applications"></div></article>
+      </div>
+      <div class="adm__cards ops__health-strip" id="overview-health"></div>
+    </section>
+
+    <section class="adm__view" data-view="quotes">
+      <header class="adm__head"><div><h1>Quotations</h1><p>Review customer requests, manage bidding, assignment and commercial status.</p></div></header>
+      <div class="ops__toolbar">
+        <label class="adm__search"><svg class="ic"><use href="#i-search"/></svg><input class="input" id="quote-search" type="search" placeholder="Search reference, customer, phone or city" /></label>
+        <select class="select" id="quote-status"><option value="">All statuses</option><option>draft</option><option>submitted</option><option>bidding</option><option>quoted</option><option>confirmed</option><option>delivered</option><option>cancelled</option></select>
+      </div>
+      <div class="adm__tablewrap"><table class="adm__table ops__table"><thead><tr><th>Reference</th><th>Customer</th><th>Delivery</th><th class="num">Subtotal</th><th>Status</th><th>Assigned</th><th></th></tr></thead><tbody id="quote-rows"></tbody></table><p class="adm__empty" id="quote-empty" hidden>No quotations found.</p></div>
+    </section>
+
+    <section class="adm__view" data-view="projects">
+      <header class="adm__head"><div><h1>Projects</h1><p>Control review, estimating, award and delivery progress.</p></div></header>
+      <div class="ops__toolbar">
+        <label class="adm__search"><svg class="ic"><use href="#i-search"/></svg><input class="input" id="project-search" type="search" placeholder="Search reference, client, project or location" /></label>
+        <select class="select" id="project-status"><option value="">All statuses</option><option>received</option><option>under_review</option><option>estimating</option><option>quoted</option><option>awarded</option><option>in_progress</option><option>completed</option><option>archived</option></select>
+      </div>
+      <div class="adm__tablewrap"><table class="adm__table ops__table"><thead><tr><th>Reference</th><th>Project</th><th>Client</th><th>Progress</th><th>Status</th><th>Assigned</th><th></th></tr></thead><tbody id="project-rows"></tbody></table><p class="adm__empty" id="project-empty" hidden>No projects found.</p></div>
+    </section>
+
+    <section class="adm__view" data-view="inquiries">
+      <header class="adm__head"><div><h1>Inquiries</h1><p>Customer messages and follow-up status.</p></div></header>
+      <div class="ops__toolbar"><label class="adm__search"><svg class="ic"><use href="#i-search"/></svg><input class="input" id="inquiry-search" type="search" placeholder="Search name, email, phone or subject" /></label><select class="select" id="inquiry-status"><option value="">All inquiries</option><option value="open">Open</option><option value="handled">Handled</option></select></div>
+      <div class="adm__tablewrap"><table class="adm__table ops__table"><thead><tr><th>Contact</th><th>Subject</th><th>Source</th><th>Received</th><th>Status</th><th></th></tr></thead><tbody id="inquiry-rows"></tbody></table><p class="adm__empty" id="inquiry-empty" hidden>No inquiries found.</p></div>
+    </section>
+
+    <section class="adm__view" data-view="applications">
+      <header class="adm__head"><div><h1>Supplier applications</h1><p>Review onboarding submissions and promote approved businesses into the supplier registry.</p></div></header>
+      <div class="ops__toolbar"><label class="adm__search"><svg class="ic"><use href="#i-search"/></svg><input class="input" id="application-search" type="search" placeholder="Search reference, business, contact or city" /></label><select class="select" id="application-status"><option value="">All statuses</option><option>received</option><option>under_review</option><option>approved</option><option>rejected</option></select></div>
+      <div class="adm__tablewrap"><table class="adm__table ops__table"><thead><tr><th>Reference</th><th>Business</th><th>Category</th><th>Location</th><th>Status</th><th>Submitted</th><th></th></tr></thead><tbody id="application-rows"></tbody></table><p class="adm__empty" id="application-empty" hidden>No supplier applications found.</p></div>
+    </section>
+
+    <section class="adm__view" data-view="suppliers">
+      <header class="adm__head"><div><h1>Supplier registry</h1><p>Verification, reliability and account-link readiness for approved suppliers.</p></div></header>
+      <div class="ops__toolbar"><label class="adm__search"><svg class="ic"><use href="#i-search"/></svg><input class="input" id="supplier-search" type="search" placeholder="Search company, contact, city or email" /></label><select class="select" id="supplier-status"><option value="">All suppliers</option><option value="verified">Verified</option><option value="unverified">Unverified</option><option value="linked">Login linked</option><option value="unlinked">No login</option></select></div>
+      <div class="adm__tablewrap"><table class="adm__table ops__table"><thead><tr><th>Company</th><th>Contact</th><th>City</th><th>Reliability</th><th>Verification</th><th>Account</th><th></th></tr></thead><tbody id="supplier-rows"></tbody></table><p class="adm__empty" id="supplier-empty" hidden>No suppliers found.</p></div>
+    </section>
+
+    <section class="adm__view" data-view="notifications">
+      <header class="adm__head"><div><h1>Notifications</h1><p>In-app operational notifications generated by backend events.</p></div><button class="btn btn--ghost btn--sm" id="mark-all-visible-read">Mark visible as read</button></header>
+      <div class="adm__tablewrap"><table class="adm__table ops__table"><thead><tr><th>Event</th><th>Message</th><th>Recipient</th><th>Created</th><th>Status</th><th></th></tr></thead><tbody id="notification-rows"></tbody></table><p class="adm__empty" id="notification-empty" hidden>No notifications yet.</p></div>
+    </section>
+
+    <section class="adm__view" data-view="system">
+      <header class="adm__head"><div><h1>System &amp; audit</h1><p>Operational health, delivery outbox and immutable staff activity history.</p></div><button class="btn btn--ghost btn--sm" id="run-maintenance"><svg class="ic"><use href="#i-refresh"/></svg>Run safe maintenance</button></header>
+      <div class="ops__kpis" id="system-health"></div>
+      <div class="ops__system-grid">
+        <article class="adm__card adm__card--wide"><header class="ops__cardhead"><div><h3>Notification outbox</h3><p>Provider-neutral delivery queue. Browser users cannot lease or acknowledge jobs.</p></div><div id="outbox-summary"></div></header><div class="adm__tablewrap ops__inner-table"><table class="adm__table"><thead><tr><th>Channel</th><th>Recipient</th><th>Template</th><th>Status</th><th>Attempts</th><th>Created</th></tr></thead><tbody id="outbox-rows"></tbody></table></div></article>
+        <article class="adm__card adm__card--wide"><header class="ops__cardhead"><div><h3>Audit trail</h3><p>Recent database mutations captured for staff review.</p></div></header><div class="adm__tablewrap ops__inner-table"><table class="adm__table"><thead><tr><th>Time</th><th>Actor</th><th>Action</th><th>Entity</th><th>Entity ID</th></tr></thead><tbody id="audit-rows"></tbody></table></div></article>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="adm__drawer-wrap" id="ops-drawer" aria-hidden="true">
+  <div class="adm__drawer-overlay" data-close-ops-drawer></div>
+  <div class="adm__drawer ops__drawer" role="dialog" aria-modal="true" aria-labelledby="ops-drawer-title">
+    <header class="adm__drawer-head"><div><span class="ops__eyebrow" id="ops-drawer-eyebrow"></span><h2 id="ops-drawer-title">Details</h2></div><button class="icon-btn" data-close-ops-drawer aria-label="Close details"><svg class="ic"><use href="#i-x"/></svg></button></header>
+    <div class="adm__drawer-body" id="ops-drawer-body"></div>
+    <footer class="adm__drawer-foot" id="ops-drawer-foot"></footer>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/data.js?v=20"></script>
+<script src="assets/js/store.js?v=25"></script>
+<script src="assets/js/backend-api.js?v=2"></script>
+<script src="assets/js/admin-operations.js?v=1"></script>
+</body>
+</html>
