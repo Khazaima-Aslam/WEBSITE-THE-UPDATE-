@@ -1,25 +1,15 @@
 /* ═══════════════════════════════════════════════════════════════
    CKA BuildStruct — store.js
-   The only file that knows where data comes from.
+   Single data-access layer for public pages and the admin console.
 
-   Everything else (app.js, admin.js) calls CKAStore and never touches
-   localStorage, fetch, or a database client directly. Swapping the
-   backend is therefore a one-line change at the bottom of this file,
-   not a refactor of the application.
-
-       CKAStore.products.list()        → Promise<Product[]>
-       CKAStore.products.save(p)       → Promise<Product>
-       CKAStore.products.remove(id)    → Promise<void>
-       CKAStore.products.replaceAll(a) → Promise<void>
-       CKAStore.categories.list()      → Promise<Category[]>
-       CKAStore.files.upload(file, meta)→ Promise<{path,url,size}>
-       CKAStore.projects.create(p)     → Promise<Project>   (reference is generated here)
-       CKAStore.projects.list()        → Promise<Project[]> (admin use)
-       CKAStore.inquiries.create(i)    → Promise<Inquiry>   (contact form)
-
-   Two implementations ship here:
-     LocalStore     — works today, no backend, browser storage
-     SupabaseStore  — stubbed against db/schema.sql, ready to enable
+   Production rules:
+   - one Supabase client per page
+   - public catalogue reads through v_catalogue
+   - product mutations go through RLS-protected tables
+   - anonymous contact/project submissions use hardened RPCs
+   - project files stay in private project-uploads
+   - catalogue images use the public product-images bucket
+   - static data remains a fallback if Supabase is unavailable
    ═══════════════════════════════════════════════════════════════ */
 (function (global) {
   "use strict";
@@ -27,369 +17,372 @@
   const DRAFT_KEY = "cka-catalogue-draft-v1";
   const PROJECT_KEY = "cka-projects-v1";
 
-  /* CKA-P-2026-04821 — readable, collision-safe without a server round trip */
-  function genRef(prefix) {
-    const y = new Date().getFullYear();
-    const n = Math.floor(10000 + Math.random() * 90000);
-    return prefix + "-" + y + "-" + n;
+  global.CKA_CONFIG = global.CKA_CONFIG || {
+    supabaseUrl: "https://qrjglihvjhhemqoegqmt.supabase.co",
+    supabaseAnonKey: "sb_publishable_8dwB_hn54sbrDsLgZR_7HQ_GEB9yHs4",
+    storageBucket: "project-uploads",
+    productImageBucket: "product-images"
+  };
+
+  function safeArray(value) {
+    return Array.isArray(value) ? value : [];
   }
 
-  /* ── shared shape ────────────────────────────────────────────
-     One canonical product shape used everywhere. The seed data in
-     data.js is the older, flatter format, so it is normalised on
-     the way in and denormalised on the way out. Nothing downstream
-     ever has to know which format it came from. */
+  function specsToText(specs) {
+    if (!specs || typeof specs !== "object" || Array.isArray(specs)) return "";
+    return Object.entries(specs)
+      .filter(([key]) => !["grade", "size", "badge", "quality", "source_catalogue_id"].includes(key))
+      .map(([key, value]) => `${key}: ${value}`)
+      .join("; ");
+  }
+
   function normalise(p) {
+    const images = safeArray(p.images).length
+      ? safeArray(p.images).slice()
+      : (p.img ? [p.img] : []);
+
     return {
-      id:         p.id,
-      sku:        p.sku || String(p.id),
-      title:      p.title || p.name || "",
-      category:   p.category || "",
+      id: p.id,
+      sku: p.sku || (p.id == null ? "" : String(p.id)),
+      category_id: p.category_id || null,
+      supplier_id: p.supplier_id || null,
+      title: p.title || p.name || "",
+      category: p.category || "",
       subcategory: p.subcategory || "",
-      brand:      p.brand || "",
+      brand: p.brand || "",
       description: p.description || "",
-      unit:       p.unit || "",
-      quality:    p.quality || "A",
-      grade:      p.grade || "",
-      size:       p.size || "",
-      badge:      p.badge || "",
-      supplier:   p.supplier || "",
-      price:      Number(p.price) || 0,
-      oldPrice:   Number(p.oldPrice) || 0,
-      range:      p.range || "",
-      stock:      p.stock || "",
-      img:        p.img || (Array.isArray(p.images) && p.images[0]) || "",
-      images:     Array.isArray(p.images) && p.images.length ? p.images.slice()
-                  : (p.img ? [p.img] : []),
-      featured:   !!p.featured,
-      order:      Number(p.order) || 0,
-      specs:      p.specs || "",
-      tags:       Array.isArray(p.tags) ? p.tags : (p.tags ? String(p.tags).split(/\s*,\s*/) : []),
-      rating:     Number(p.rating) || 0,
-      deals:      p.deals || "",
-      active:     p.active !== false
+      unit: p.unit || "",
+      quality: p.quality || "A",
+      grade: p.grade || "",
+      size: p.size || "",
+      badge: p.badge || "",
+      supplier: p.supplier || "",
+      price: Number(p.price) || 0,
+      oldPrice: Number(p.oldPrice) || 0,
+      range: p.range || "",
+      stock: p.stock || "",
+      img: p.img || images[0] || "",
+      images,
+      featured: !!p.featured,
+      order: Number(p.order) || 0,
+      specs: p.specs || "",
+      tags: Array.isArray(p.tags) ? p.tags.slice() : (p.tags ? String(p.tags).split(/\s*,\s*/).filter(Boolean) : []),
+      rating: Number(p.rating) || 0,
+      deals: p.deals == null ? 0 : p.deals,
+      active: p.active !== false
     };
   }
 
-  /* ── LocalStore ──────────────────────────────────────────────
-     Reads the shipped catalogue from data.js, then layers any
-     unsaved admin edits on top from localStorage. Nothing is lost
-     if the browser is closed; nothing is published until the admin
-     exports a new data.js. */
+  function fromCatalogueRow(row) {
+    const specs = row.specifications && typeof row.specifications === "object" ? row.specifications : {};
+    const gallery = safeArray(row.images).map((item) => item && item.url).filter(Boolean);
+    const main = row.main_image || gallery[0] || "";
+    const images = [main, ...gallery.filter((url) => url && url !== main)].filter(Boolean);
+
+    return normalise({
+      id: row.id,
+      sku: row.sku,
+      title: row.name,
+      category: row.category_name,
+      subcategory: row.parent_category ? row.category_name : "",
+      brand: row.brand,
+      quality: row.quality,
+      description: row.description,
+      unit: row.unit,
+      price: row.price,
+      oldPrice: row.old_price,
+      range: row.price_min != null && row.price_max != null
+        ? `PKR ${Number(row.price_min).toLocaleString("en-PK")} – ${Number(row.price_max).toLocaleString("en-PK")}`
+        : "",
+      stock: row.stock,
+      supplier: row.supplier_name,
+      rating: row.rating,
+      deals: row.order_count,
+      featured: row.is_featured,
+      order: row.display_order,
+      tags: row.tags,
+      img: main,
+      images,
+      grade: specs.grade || "",
+      size: specs.size || "",
+      badge: specs.badge || "",
+      specs: specsToText(specs)
+    });
+  }
+
+  function safeFileName(name) {
+    return String(name || "file")
+      .replace(/[^a-zA-Z0-9._-]/g, "-")
+      .replace(/-+/g, "-")
+      .slice(0, 180) || "file";
+  }
+
+  function randomId() {
+    if (global.crypto && typeof global.crypto.randomUUID === "function") return global.crypto.randomUUID();
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = Math.random() * 16 | 0;
+      const v = c === "x" ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  /* ── Static fallback ───────────────────────────────────────── */
   const LocalStore = {
     name: "local",
     readonly: false,
-
-    _draft() {
-      try { return JSON.parse(localStorage.getItem(DRAFT_KEY)); }
-      catch (e) { return null; }
-    },
-    _writeDraft(list) {
-      try {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(list));
-        return true;
-      } catch (e) {
-        // quota exceeded, or private browsing
-        return false;
-      }
-    },
-    _seed() {
-      const src = (typeof PRODUCTS !== "undefined" && PRODUCTS) || [];
-      return src.map(normalise);
-    },
-
     products: {
       async list() {
-        const draft = LocalStore._draft();
-        return (draft ? draft.map(normalise) : LocalStore._seed());
+        let draft = null;
+        try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch (err) {}
+        const seed = (typeof PRODUCTS !== "undefined" && Array.isArray(PRODUCTS)) ? PRODUCTS : [];
+        return (draft || seed).map(normalise);
       },
       async save(product) {
         const list = await LocalStore.products.list();
         const p = normalise(product);
-        if (!p.id) p.id = Math.max(0, ...list.map((x) => +x.id || 0)) + 1;
-        const i = list.findIndex((x) => String(x.id) === String(p.id));
-        if (i > -1) list[i] = p; else list.push(p);
-        LocalStore._writeDraft(list);
+        if (!p.id) p.id = Math.max(0, ...list.map((x) => Number(x.id) || 0)) + 1;
+        const index = list.findIndex((x) => String(x.id) === String(p.id));
+        if (index >= 0) list[index] = p; else list.push(p);
+        try { localStorage.setItem(DRAFT_KEY, JSON.stringify(list)); } catch (err) {}
         return p;
       },
       async remove(id) {
-        const list = (await LocalStore.products.list()).filter((x) => String(x.id) !== String(id));
-        LocalStore._writeDraft(list);
+        const list = (await LocalStore.products.list()).filter((p) => String(p.id) !== String(id));
+        try { localStorage.setItem(DRAFT_KEY, JSON.stringify(list)); } catch (err) {}
       },
       async replaceAll(list) {
-        LocalStore._writeDraft(list.map(normalise));
+        try { localStorage.setItem(DRAFT_KEY, JSON.stringify(list.map(normalise))); } catch (err) {}
       },
       async discardDraft() {
-        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+        try { localStorage.removeItem(DRAFT_KEY); } catch (err) {}
       },
-      hasDraft() { return !!LocalStore._draft(); }
+      hasDraft() {
+        try { return !!localStorage.getItem(DRAFT_KEY); } catch (err) { return false; }
+      }
     },
-
     categories: {
       async list() {
         const groups = (typeof GROUPS !== "undefined" && GROUPS) || {};
-        return Object.entries(groups).map(([slug, def], i) => ({
-          slug, name: def.label, order: i, children: def.categories.slice()
+        return Object.entries(groups).map(([slug, def], index) => ({
+          slug,
+          name: def.label,
+          order: index,
+          children: safeArray(def.categories).slice()
         }));
       }
     },
-
     files: {
-      /* No backend, so a file is held in memory for the length of the
-         session and described honestly. Nothing is silently discarded. */
       async upload(file) {
         return {
-          path: "local://" + file.name,
+          path: `local://${safeFileName(file.name)}`,
           url: URL.createObjectURL(file),
           size: file.size,
           name: file.name,
           type: file.type,
-          persisted: false,
-          note: "Held in this browser only — connect storage to persist uploads."
+          persisted: false
         };
-      }
-    },
-
-    projects: {
-      async list() {
-        try { return JSON.parse(localStorage.getItem(PROJECT_KEY)) || []; }
-        catch (e) { return []; }
       },
+      async remove() {}
+    },
+    projects: {
       async create(p) {
-        const list = await LocalStore.projects.list();
         const row = {
-          id: (crypto.randomUUID && crypto.randomUUID()) || String(Date.now()),
-          reference: genRef("CKA-P"),
-          status: "received",
+          id: randomId(),
+          reference: `CKA-P-${Date.now()}`,
           created_at: new Date().toISOString(),
           persisted: false,
           ...p
         };
+        let list = [];
+        try { list = JSON.parse(localStorage.getItem(PROJECT_KEY)) || []; } catch (err) {}
         list.unshift(row);
-        try { localStorage.setItem(PROJECT_KEY, JSON.stringify(list)); } catch (e) {}
+        try { localStorage.setItem(PROJECT_KEY, JSON.stringify(list)); } catch (err) {}
         return row;
+      },
+      async list() {
+        try { return JSON.parse(localStorage.getItem(PROJECT_KEY)) || []; } catch (err) { return []; }
       }
     },
-
     inquiries: {
-      async create(i) {
-        return { id: (crypto.randomUUID && crypto.randomUUID()) || String(Date.now()), persisted: false, ...i };
-      }
+      async create(i) { return { ...i, persisted: false }; }
     }
   };
 
-  /* ── SupabaseStore ───────────────────────────────────────────
-     Not active. Enable by loading the supabase-js client, filling in
-     CKA_CONFIG below, and changing the export at the bottom.
-     Column names match db/schema.sql exactly. */
-  function createSupabaseStore(client, bucket) {
-    const B = bucket || "project-uploads";
+  function createSupabaseStore(client, projectBucket) {
+    const B = projectBucket || "project-uploads";
 
-const fromRow = (r) => normalise({
-  id: r.id, sku: r.sku, title: r.name, category: r.category_name,
-  subcategory: r.parent_category ? r.category_name : "",
- brand: r.brand, quality: r.quality, description: r.description, unit: r.unit, price: r.price, oldPrice: r.old_price,
-  range: r.price_min && r.price_max ? `PKR ${r.price_min} – ${r.price_max}` : "",
-  stock: r.stock, supplier: r.supplier_name, rating: r.rating,
-  deals: r.order_count, featured: r.is_featured, order: r.display_order,
-  tags: r.tags, img: r.main_image,
-images: (r.images || []).map((i) => i.url)
-});
+    async function categoryIdFor(product) {
+      if (product.category_id) return product.category_id;
+      const name = String(product.category || "").trim();
+      if (!name) throw new Error("A product category is required.");
+
+      const { data, error } = await client
+        .from("categories")
+        .select("id,name")
+        .eq("name", name)
+        .limit(2);
+      if (error) throw error;
+      if (!data || data.length !== 1) throw new Error(`Category could not be resolved uniquely: ${name}`);
+      return data[0].id;
+    }
 
     return {
       name: "supabase",
       readonly: false,
       products: {
         async list() {
-  const { data, error } = await client
-    .from("v_catalogue")
-    .select("*")
-    .order("display_order");
+          const { data, error } = await client
+            .from("v_catalogue")
+            .select("*")
+            .order("display_order", { ascending: true });
+          if (error) throw error;
 
-  if (error) throw error;
+          const products = safeArray(data).map(fromCatalogueRow);
+          const { data: categories, error: categoryError } = await client
+            .from("categories")
+            .select("id,name")
+            .eq("is_active", true);
+          if (!categoryError && categories) {
+            const categoryMap = new Map(categories.map((row) => [row.name, row.id]));
+            products.forEach((product) => {
+              product.category_id = categoryMap.get(product.category) || null;
+            });
+          }
+          return products;
+        },
 
- const products = data.map(fromRow);
+        async save(product) {
+          const p = normalise(product);
+          const categoryId = await categoryIdFor(product);
+          const payload = {
+            sku: p.sku || null,
+            name: p.title,
+            category_id: categoryId,
+            image_url: p.images[0] || p.img || null,
+            brand: p.brand || null,
+            quality: p.quality || null,
+            description: p.description || null,
+            unit: p.unit,
+            price: p.price,
+            old_price: p.oldPrice || null,
+            stock: p.stock || "in_stock",
+            tags: p.tags,
+            is_featured: p.featured,
+            display_order: p.order,
+            is_active: p.active !== false
+          };
+          if (p.id) payload.id = p.id;
 
-// Load all categories once instead of querying once per product
-const { data: categories, error: categoryError } = await client
-  .from("categories")
-  .select("id, name");
+          const { data, error } = await client
+            .from("products")
+            .upsert(payload)
+            .select("id")
+            .single();
+          if (error) throw error;
 
-if (!categoryError && categories) {
-  const categoryMap = new Map(
-    categories.map(c => [c.name, c.id])
-  );
+          const { data: viewRow, error: viewError } = await client
+            .from("v_catalogue")
+            .select("*")
+            .eq("id", data.id)
+            .single();
+          if (viewError) throw viewError;
+          const saved = fromCatalogueRow(viewRow);
+          saved.category_id = categoryId;
+          return saved;
+        },
 
-  for (const product of products) {
-    product.category_id = categoryMap.get(product.category) || null;
-  }
-}
-
-return products;
-
-  return products;
-},
-async save(p) {
-  const { data: categoryRow, error: categoryError } = await client
-    .from("categories")
-    .select("id")
-    .eq("name", p.category)
-    .limit(1)
-    .single();
-
-  if (categoryError || !categoryRow) {
-    console.error("CATEGORY LOOKUP ERROR:", categoryError);
-    throw new Error(`Category not found: ${p.category}`);
-  }
-
-  const { data, error } = await client.from("products").upsert({
-    id: p.id || undefined,
-    sku: p.sku,
-    name: p.title,
-    category_id: categoryRow.id,
-    image_url: Array.isArray(p.images) ? p.images[0] || null : null,
-    brand: p.brand,
-    quality: p.quality || null,
-    description: p.description,
-    unit: p.unit,
-    price: p.price,
-    old_price: p.oldPrice || null,
-    stock: p.stock || "in_stock",
-    tags: p.tags,
-    is_featured: p.featured,
-    display_order: p.order,
-    is_active: p.active
-  }).select().single();
-
-  if (error) throw error;
-
-  return fromRow(data);
-},
         async remove(id) {
-          const { error } = await client.from("products")
-            .update({ is_active: false }).eq("id", id);   // soft delete
+          const { error } = await client.from("products").update({ is_active: false }).eq("id", id);
           if (error) throw error;
         },
         async replaceAll() {
-          throw new Error("replaceAll is unavailable on the live database — import through the admin review step instead.");
+          throw new Error("Full catalogue replacement is disabled on production. Use reviewed merge imports.");
         },
+        async discardDraft() {},
         hasDraft() { return false; }
       },
-categories: {
-  async list() {
-    const { data, error } = await client
-      .from("categories")
-      .select("*")
-      .order("display_order");
 
-    if (error) throw error;
+      categories: {
+        async list() {
+          const { data, error } = await client
+            .from("categories")
+            .select("id,parent_id,slug,name,display_order,is_active")
+            .eq("is_active", true)
+            .order("display_order", { ascending: true });
+          if (error) throw error;
+          const rows = safeArray(data);
+          return rows.filter((row) => !row.parent_id).map((parent, index) => ({
+            id: parent.id,
+            slug: parent.slug,
+            name: parent.name,
+            order: parent.display_order == null ? index : parent.display_order,
+            children: rows
+              .filter((child) => child.parent_id === parent.id)
+              .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+              .map((child) => child.name)
+          }));
+        }
+      },
 
-    const rows = data || [];
+      files: {
+        async upload(file, meta) {
+          const folder = String(meta?.folder || "misc").replace(/[^a-zA-Z0-9_-]/g, "-");
+          const path = `${folder}/${randomId()}-${safeFileName(file.name)}`;
+          const { error } = await client.storage.from(B).upload(path, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type || undefined
+          });
+          if (error) throw error;
+          return {
+            path,
+            url: null,
+            size: file.size,
+            name: file.name,
+            type: file.type || "application/octet-stream",
+            persisted: true,
+            bucket: B
+          };
+        },
+        async remove(path) {
+          if (!path) return [];
+          const { data, error } = await client.storage.from(B).remove([path]);
+          if (error) throw error;
+          return data;
+        }
+      },
 
-    const parents = rows
-      .filter(r => !r.parent_id)
-      .map((r, i) => ({
-        slug: r.slug,
-        name: r.name,
-        order: r.display_order ?? i,
-        children: rows
-          .filter(c => c.parent_id === r.id)
-          .sort(
-            (a, b) =>
-              (a.display_order ?? 0) - (b.display_order ?? 0)
-          )
-          .map(c => c.name)
-      }));
-
-    return parents;
-  }
-},
-     files: {
-  async upload(file, meta) {
-    const path = `${(meta && meta.folder) || "misc"}/${Date.now()}-${file.name}`;
-
-    const { error } = await client.storage
-      .from(B)
-      .upload(path, file);
-
-    if (error) throw error;
-
-    const { data } = client.storage
-      .from(B)
-      .getPublicUrl(path);
-
-    return {
-      path,
-      url: data.publicUrl,
-      size: file.size,
-      name: file.name,
-      type: file.type,
-      persisted: true
-    };
-  },
-
-async remove(path) {
-  if (!path) return;
-
-  const { data, error } = await client.storage
-    .from(B)
-    .remove([path]);
-
-  console.log("STORAGE REMOVE RESULT:", {
-    path,
-    data,
-    error
-  });
-
-  if (error) throw error;
-
-  return data;
-}
-},
-
-      /* Real backend for "Post a Project": inserts into `projects`, then
-         attaches the uploaded BOQ/drawing (if any) as a `project_files`
-         row. Anonymous submissions are allowed by RLS (customer_id stays
-         null until supplier/customer auth ships). */
       projects: {
         async create(p) {
-          const reference = genRef("CKA-P");
-          const scopeParts = [p.material, p.qty ? ("Qty: " + p.qty) : null].filter(Boolean);
+          const scope = [
+            p.material ? `Requirement: ${p.material}` : null,
+            p.qty ? `Quantity: ${p.qty}` : null,
+            p.message ? String(p.message) : null
+          ].filter(Boolean).join("\n");
 
-          const { data, error } = await client.from("projects").insert({
-            reference,
-            client_name: p.name,
-            phone: p.phone,
-            email: p.email || null,
-            project_type: p.ptype || null,
-            location: p.city || null,
-            project_name: p.material || null,
-            scope: scopeParts.join(" — ") || null,
-            notes: p.message || null,
-            status: "received"
-          }).select().single();
-
+          const file = p.file && p.file.persisted ? p.file : null;
+          const { data: reference, error } = await client.rpc("submit_project_with_file", {
+            p_client_name: String(p.name || "").trim(),
+            p_phone: String(p.phone || "").trim(),
+            p_email: p.email || null,
+            p_company: p.company || null,
+            p_project_name: p.material || null,
+            p_project_type: p.ptype || null,
+            p_location: p.city || null,
+            p_budget_min: p.budgetMin ?? null,
+            p_budget_max: p.budgetMax ?? null,
+            p_expected_completion: p.expectedCompletion || null,
+            p_scope: scope || null,
+            p_file_path: file?.path || null,
+            p_file_name: file?.name || null,
+            p_file_mime: file?.type || null,
+            p_file_size: file?.size || null
+          });
           if (error) throw error;
-
-          if (p.file && p.file.persisted) {
-            const kind = /\.dwg$/i.test(p.file.name || "") ? "drawing_dwg" : "boq";
-            const { error: fileErr } = await client.from("project_files").insert({
-              project_id: data.id,
-              kind,
-              original_name: p.file.name || "attachment",
-              storage_bucket: B,
-              storage_path: p.file.path,
-              mime_type: p.file.type || null,
-              size_bytes: p.file.size || null
-            });
-            if (fileErr) console.error("project_files insert failed:", fileErr);
-          }
-
-          return { ...data, persisted: true };
+          return { reference, persisted: true };
         },
         async list() {
-          const { data, error } = await client.from("projects")
-            .select("*").order("created_at", { ascending: false });
+          const { data, error } = await client.from("projects").select("*").order("created_at", { ascending: false });
           if (error) throw error;
           return data || [];
         }
@@ -397,43 +390,43 @@ async remove(path) {
 
       inquiries: {
         async create(i) {
-          const { data, error } = await client.from("inquiries").insert({
-            name: i.name,
-            email: i.email || null,
-            phone: i.phone || null,
-            subject: i.topic || null,
-            message: i.message,
-            source: i.source || "contact_form"
-          }).select().single();
+          const { data, error } = await client.rpc("submit_inquiry", {
+            p_name: String(i.name || "").trim(),
+            p_message: String(i.message || "").trim(),
+            p_email: i.email || null,
+            p_phone: i.phone || null,
+            p_subject: i.topic || null,
+            p_source: i.source || "contact_form"
+          });
           if (error) throw error;
-          return { ...data, persisted: true };
+          return { persisted: !!data };
+        }
+      },
+
+      quotes: {
+        async create(payload) {
+          const { data, error } = await client.rpc("submit_quote", payload);
+          if (error) throw error;
+          return { reference: data, persisted: true };
         }
       }
     };
   }
 
-  /* ── active backend ──────────────────────────────────────────
-     To go live:
-       1. run db/schema.sql on your Supabase project
-       2. load @supabase/supabase-js before this file
-       3. set CKA_CONFIG below
-       4. change the line marked ACTIVE */
-  global.CKA_CONFIG = global.CKA_CONFIG || { supabaseUrl: "https://qrjglihvjhhemqoegqmt.supabase.co", supabaseAnonKey: "sb_publishable_8dwB_hn54sbrDsLgZR_7HQ_GEB9yHs4", storageBucket: "project-uploads" };
+  let active = LocalStore;
+  let sb = null;
+  if (global.supabase && typeof global.supabase.createClient === "function") {
+    sb = global.supabase.createClient(
+      global.CKA_CONFIG.supabaseUrl,
+      global.CKA_CONFIG.supabaseAnonKey
+    );
+    active = createSupabaseStore(sb, global.CKA_CONFIG.storageBucket);
+    active.storage = sb.storage;
+    active.supabase = sb;
+  }
 
- const sb = supabase.createClient(
-  CKA_CONFIG.supabaseUrl,
-  CKA_CONFIG.supabaseAnonKey
-);
-
-let active = createSupabaseStore(
-  sb,
-  CKA_CONFIG.storageBucket
-);
-
-active.storage = sb.storage;
-global.CKAStore = active;
-global.CKAStore.supabase = sb;
-global.CKAStore.normalise = normalise;
-global.CKAStore.LocalStore = LocalStore;
-global.CKAStore.createSupabaseStore = createSupabaseStore;
+  active.normalise = normalise;
+  active.LocalStore = LocalStore;
+  active.createSupabaseStore = createSupabaseStore;
+  global.CKAStore = active;
 })(window);
