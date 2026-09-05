@@ -11,6 +11,22 @@
     if (title && /Source\s+smarter/i.test(title.textContent || "")) {
       title.textContent = "Build with confidence.";
     }
+
+    const video = document.querySelector(".hero__video");
+    if (video && !video.dataset.ckaPremiumHero) {
+      video.dataset.ckaPremiumHero = "true";
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      const source = global.matchMedia && global.matchMedia("(max-width: 640px)").matches
+        ? "assets/video/design-360.mp4"
+        : "assets/video/design-720.mp4";
+      video.pause();
+      video.src = source;
+      video.load();
+      const playing = video.play();
+      if (playing && typeof playing.catch === "function") playing.catch(() => {});
+    }
   }
 
   installHomepagePolish();
