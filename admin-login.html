@@ -66,15 +66,15 @@
   <div class="login-box">
     <div class="logo">
       <h1>CKA BuildStruct</h1>
-      <p>Administrator Login</p>
+      <p>Operations &amp; Administration Login</p>
     </div>
 
     <form id="loginForm" autocomplete="on">
       <label for="email">Email</label>
-      <input id="email" type="email" autocomplete="username" placeholder="Admin email" required>
+      <input id="email" type="email" autocomplete="username" placeholder="Admin or staff email" required>
 
       <label for="password">Password</label>
-      <input id="password" type="password" autocomplete="current-password" placeholder="Enter admin password" required>
+      <input id="password" type="password" autocomplete="current-password" placeholder="Enter password" required>
 
       <button id="loginBtn" type="submit">Sign In</button>
     </form>
@@ -111,7 +111,7 @@
         .single();
 
       if (!error && profile && ["admin", "staff"].includes(profile.role)) {
-        window.location.replace("admin.html");
+        window.location.replace("admin-operations.html");
       }
     } catch (err) {
       console.warn("Existing admin session check failed:", err);
@@ -143,12 +143,12 @@
 
       if (!profile || !["admin", "staff"].includes(profile.role)) {
         await client.auth.signOut();
-        throw new Error("Access denied. This account is not authorized for the admin dashboard.");
+        throw new Error("Access denied. This account is not authorized for the operations dashboard.");
       }
 
       message.style.color = "#7bd88f";
-      message.textContent = "Login successful. Opening dashboard...";
-      window.location.replace("admin.html");
+      message.textContent = "Login successful. Opening operations console...";
+      window.location.replace("admin-operations.html");
     } catch (error) {
       console.error("LOGIN ERROR:", error);
       message.style.color = "#ff7777";
