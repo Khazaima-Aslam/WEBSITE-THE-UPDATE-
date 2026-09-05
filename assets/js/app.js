@@ -45,18 +45,21 @@
   const heroMedia = $(".hero__media");
   if (heroVideo) {
     const turnOn = () => heroVideo.classList.add("is-on");
-    heroVideo.addEventListener("canplay", turnOn);
+    const turnOff = () => heroVideo.classList.remove("is-on");
+    heroVideo.removeAttribute("poster");
     heroVideo.addEventListener("playing", turnOn);
-    heroVideo.addEventListener("error", turnOn); // poster + bg fallback
+    heroVideo.addEventListener("waiting", turnOff);
+    heroVideo.addEventListener("stalled", turnOff);
+    heroVideo.addEventListener("error", turnOff);
     if (reducedMotion) {
       heroVideo.removeAttribute && heroVideo.removeAttribute("autoplay");
       heroVideo.pause && heroVideo.pause();
-      turnOn(); // show the poster frame as a still hero
+      turnOff(); // keep the existing dark hero background; never show a still image
     } else {
       const src = (navigator.connection && navigator.connection.saveData) || mq("(max-width: 700px)")
         ? "540" : "720";
       heroVideo.src = "assets/video/hero-" + src + ".mp4";
-      try { const p = heroVideo.play && heroVideo.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+      try { const p = heroVideo.play && heroVideo.play(); if (p && p.catch) p.catch(turnOff); } catch (e) { turnOff(); }
 
     }
   }
