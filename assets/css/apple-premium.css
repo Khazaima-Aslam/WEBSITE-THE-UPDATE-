@@ -1,7 +1,8 @@
 /* CKA BuildStruct — premium navigation + typography refinement
    User-approved scope: keep the compact Apple-inspired toolbar/navigation
    and cleaner text treatment while preserving CKA's existing page colors,
-   cards, buttons, forms, sections, footer and operational styling. */
+   cards, buttons, forms, sections, footer and operational styling.
+   Final supplied architectural hero media is self-hosted in the local hero slots. */
 
 :root{
   --head-h:52px;
