@@ -8,7 +8,7 @@
   const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const date = (v) => v ? new Intl.DateTimeFormat("en-PK", { dateStyle:"medium", timeStyle:"short" }).format(new Date(v)) : "—";
   const pkr = (v) => `PKR ${Number(v || 0).toLocaleString("en-PK", { maximumFractionDigits:2 })}`;
-  const state = { profile:null, supplier:null, tenders:[], bids:[], notifications:[], activeTender:null, unsub:[] };
+  const state = { profile:null, supplier:null, tenders:[], bids:[], notifications:[], activeTender:null, unsub:[], pollTimer:null };
 
   if (!api || !client) return global.location.replace("account.html");
 
@@ -43,6 +43,12 @@
     const off = d.getTimezoneOffset();
     return new Date(d.getTime() - off * 60000).toISOString().slice(0,16);
   }
+  function benchmark(t) {
+    if (t.best_current_total == null) return '<div class="portal__notice">No valid supplier benchmark yet. Your offer can establish the first market position.</div>';
+    const lead = t.best_is_own ? "Your latest submitted offer currently leads." : "Anonymous market benchmark to beat.";
+    const delivery = t.best_delivery_days == null ? "delivery not stated" : `${esc(t.best_delivery_days)} days delivery`;
+    return `<div class="portal__notice ${t.best_is_own ? "portal__notice--good" : ""}"><strong>${esc(lead)}</strong><br>Best current total ${pkr(t.best_current_total)} · ${delivery}. Competing supplier identity remains private.</div>`;
+  }
 
   async function history() {
     const { data, error } = await client.rpc("supplier_bid_history", { p_limit:200 });
@@ -61,19 +67,20 @@
   function render() {
     const submitted = state.bids.filter((b) => b.bid_status === "submitted").length;
     const awarded = state.bids.filter((b) => b.is_awarded).length;
+    const leading = state.tenders.filter((t) => t.best_is_own).length;
     $("#supplier-kpis").innerHTML = [
       ["Open tenders",state.tenders.length,"Available now"],
+      ["Currently leading",leading,"Anonymous best-price benchmark"],
       ["Bid revisions",state.bids.length,"All revisions retained"],
-      ["Active offers",submitted,"Latest submitted revisions"],
       ["Awards",awarded,"Successful CKA awards"]
     ].map(([a,b,c]) => `<article class="portal__kpi"><span>${esc(a)}</span><strong>${esc(b)}</strong><small>${esc(c)}</small></article>`).join("");
 
     $("#supplier-tender-count").textContent = state.tenders.length ? `(${state.tenders.length})` : "";
     $("#supplier-tenders-empty").hidden = state.tenders.length > 0;
-    $("#supplier-tenders").innerHTML = state.tenders.map((t) => `<article class="portal__card"><div style="display:flex;justify-content:space-between;gap:12px"><div><h3>${esc(t.reference)}</h3><p>${esc(t.delivery_city || "Delivery city not stated")} · ${(t.items || []).length} line item${(t.items || []).length===1?"":"s"}</p></div>${chip("submitted")}</div><div class="portal__notice"><strong class="portal__countdown">${esc(timeLeft(t.bidding_closes_at))}</strong><br>Closes ${date(t.bidding_closes_at)} · Minimum validity ${esc(t.min_bid_validity_days)} day(s) beyond closing.</div>${t.own_latest_bid ? `<p class="portal__meta">Your latest: revision ${esc(t.own_latest_bid.revision_no)} · ${pkr(t.own_latest_bid.total_amount)} · ${esc(t.own_latest_bid.status)}</p>` : '<p class="portal__meta">You have not bid on this tender yet.</p>'}<button class="portal__btn portal__btn--primary" data-open-tender="${esc(t.quote_id)}">${t.own_latest_bid ? "Submit new revision" : "Prepare bid"}</button></article>`).join("");
+    $("#supplier-tenders").innerHTML = state.tenders.map((t) => `<article class="portal__card"><div style="display:flex;justify-content:space-between;gap:12px"><div><h3>${esc(t.reference)}</h3><p>${esc(t.delivery_city || "Delivery city not stated")} · ${(t.items || []).length} line item${(t.items || []).length===1?"":"s"} · ${esc(t.supplier_count || 0)} supplier${Number(t.supplier_count||0)===1?"":"s"} participating</p></div>${chip("submitted")}</div><div class="portal__notice"><strong class="portal__countdown">${esc(timeLeft(t.bidding_closes_at))}</strong><br>Closes ${date(t.bidding_closes_at)} · Minimum validity ${esc(t.min_bid_validity_days)} day(s) beyond closing.</div><div style="margin-top:8px">${benchmark(t)}</div>${t.own_latest_bid ? `<p class="portal__meta">Your latest: revision ${esc(t.own_latest_bid.revision_no)} · ${pkr(t.own_latest_bid.total_amount)} · ${esc(t.own_latest_bid.status)}</p>` : '<p class="portal__meta">You have not bid on this tender yet.</p>'}<button class="portal__btn portal__btn--primary" data-open-tender="${esc(t.quote_id)}">${t.own_latest_bid ? "Submit new revision" : "Prepare bid"}</button></article>`).join("");
 
     const deadlines = state.tenders.slice().sort((a,b)=>new Date(a.bidding_closes_at)-new Date(b.bidding_closes_at)).slice(0,5);
-    $("#supplier-deadlines").innerHTML = deadlines.length ? `<ul class="portal__list">${deadlines.map((t)=>`<li><strong>${esc(t.reference)}</strong><small>${esc(timeLeft(t.bidding_closes_at))} · ${date(t.bidding_closes_at)}</small></li>`).join("")}</ul>` : '<p class="portal__meta">No active tender deadlines.</p>';
+    $("#supplier-deadlines").innerHTML = deadlines.length ? `<ul class="portal__list">${deadlines.map((t)=>`<li><strong>${esc(t.reference)}</strong><small>${esc(timeLeft(t.bidding_closes_at))} · ${date(t.bidding_closes_at)}${t.best_current_total!=null?` · best ${pkr(t.best_current_total)}`:""}</small></li>`).join("")}</ul>` : '<p class="portal__meta">No active tender deadlines.</p>';
     const recent = state.bids.slice(0,5);
     $("#supplier-recent-bids").innerHTML = recent.length ? `<ul class="portal__list">${recent.map((b)=>`<li><button class="portal__btn" data-open-bid="${esc(b.bid_id)}" style="width:100%;text-align:left"><strong>${esc(b.reference)} · Rev ${esc(b.revision_no)}</strong><small>${pkr(b.total_amount)} · ${esc(b.bid_status)}</small></button></li>`).join("")}</ul>` : '<p class="portal__meta">No bid activity yet.</p>';
 
@@ -125,6 +132,7 @@
     const latest = t.own_latest_bid;
     $("#supplier-drawer-body").innerHTML = `
       <div class="portal__notice"><strong>${esc(timeLeft(t.bidding_closes_at))}</strong><br>Closing ${date(t.bidding_closes_at)} · ${t.allow_partial_bids ? "Partial bids permitted" : "All lines must be priced"}.</div>
+      <div style="margin-top:8px">${benchmark(t)}</div>
       ${latest ? `<article class="portal__card" style="margin-top:12px"><h3>Your latest revision</h3><p>Revision ${esc(latest.revision_no)} · ${pkr(latest.total_amount)} · ${esc(latest.status)} · valid until ${date(latest.valid_until)}</p>${latest.status === "submitted" ? `<button class="portal__btn portal__btn--danger" data-withdraw-bid="${esc(latest.bid_id)}">Withdraw latest revision</button>` : ""}</article>` : ""}
       <form id="supplier-bid-form" style="margin-top:14px">
         <article class="portal__card"><h3>Itemized commercial offer</h3>${(t.items || []).map((item)=>`<div class="portal__line" data-bid-line data-item-id="${esc(item.item_id)}" data-quantity="${esc(item.quantity)}"><div class="portal__line-name"><strong>${esc(item.name)}</strong><small>${esc(item.quantity)} ${esc(item.unit)}</small></div><label class="portal__field"><span>Unit rate (PKR)</span><input class="portal__input" data-unit-rate type="number" min="0.01" step="0.01" ${t.allow_partial_bids?"":"required"}></label><label class="portal__field"><span>Brand / make</span><input class="portal__input" data-brand maxlength="160"></label><label class="portal__field"><span>Availability</span><input class="portal__input" data-availability maxlength="500" placeholder="e.g. immediate"><small data-line-total>${pkr(0)}</small></label></div>`).join("")}<div class="portal__bidtotal"><span>Computed offer total</span><strong id="supplier-bid-total">${pkr(0)}</strong></div></article>
@@ -179,6 +187,7 @@
   function installRealtime() {
     const refresh=()=>load().catch(console.error);
     state.unsub.push(api.supplier.subscribeBids(refresh),api.supplier.subscribeBidItems(refresh),api.notifications.subscribe(refresh));
+    state.pollTimer=global.setInterval(()=>load().catch(console.error),20000);
   }
 
   async function boot() {
@@ -208,6 +217,6 @@
       await load();installRealtime();
     } catch(err){console.error("CKA SUPPLIER PORTAL BOOT FAILED",err);document.body.style.visibility="visible";global.alert("Supplier portal could not start safely. Please sign in again.");}
   }
-  global.addEventListener("beforeunload",()=>state.unsub.forEach((fn)=>{try{fn();}catch(_){}}));
+  global.addEventListener("beforeunload",()=>{if(state.pollTimer)global.clearInterval(state.pollTimer);state.unsub.forEach((fn)=>{try{fn();}catch(_){}});});
   boot();
 })(window);
