@@ -1,0 +1,94 @@
+name: Finalize Supplied Homepage Hero
+
+on:
+  push:
+    branches: [apple-premium-public-redesign]
+    paths:
+      - 'assets/video/YTDown.com_YouTube_Architectural-animation-for-the-office-b_Media_OP_fVIUTr9Y_001_1080p.mp4'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.event.head_commit.message != 'Finalize supplied homepage hero media'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout preview branch
+        uses: actions/checkout@v4
+        with:
+          ref: apple-premium-public-redesign
+          fetch-depth: 0
+
+      - name: Validate supplied source
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC='assets/video/YTDown.com_YouTube_Architectural-animation-for-the-office-b_Media_OP_fVIUTr9Y_001_1080p.mp4'
+          test -s "$SRC"
+          ffprobe -v error -show_entries format=duration -show_entries stream=codec_name,width,height -of default=nw=1 "$SRC"
+          WIDTH="$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$SRC")"
+          HEIGHT="$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$SRC")"
+          test "$WIDTH" -ge 1920
+          test "$HEIGHT" -ge 1080
+
+      - name: Create production web media
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC='assets/video/YTDown.com_YouTube_Architectural-animation-for-the-office-b_Media_OP_fVIUTr9Y_001_1080p.mp4'
+
+          # Preserve the clean opening and stop at the last clean 25fps frame
+          # before the branded black end card begins (~14.15s).
+          ffmpeg -y -loglevel error -i "$SRC" -t 14.10 -an \
+            -vf 'scale=1280:720:flags=lanczos' \
+            -c:v libx264 -preset medium -crf 28 -profile:v high -level 4.0 \
+            -pix_fmt yuv420p -g 50 -keyint_min 25 -sc_threshold 0 \
+            -movflags +faststart assets/video/hero-720.mp4
+
+          ffmpeg -y -loglevel error -i "$SRC" -t 14.10 -an \
+            -vf 'scale=960:540:flags=lanczos' \
+            -c:v libx264 -preset slow -crf 32 -profile:v high -level 3.1 \
+            -pix_fmt yuv420p -g 50 -keyint_min 25 -sc_threshold 0 \
+            -movflags +faststart assets/video/hero-540.mp4
+
+          ffmpeg -y -loglevel error -ss 8.40 -i "$SRC" -frames:v 1 \
+            -vf 'scale=1600:-2:flags=lanczos' -c:v libwebp -quality 86 \
+            assets/img/hero-site.webp
+
+      - name: Verify generated hero media
+        shell: bash
+        run: |
+          set -euo pipefail
+          for FILE in assets/video/hero-720.mp4 assets/video/hero-540.mp4; do
+            test -s "$FILE"
+            AUDIO_COUNT="$(ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 "$FILE" | wc -l)"
+            test "$AUDIO_COUNT" -eq 0
+            DURATION="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$FILE")"
+            awk -v d="$DURATION" 'BEGIN { exit !(d >= 14.08 && d <= 14.13) }'
+            ffprobe -v error -show_entries stream=codec_name,width,height,pix_fmt -of default=nw=1 "$FILE"
+          done
+          test "$(stat -c%s assets/video/hero-720.mp4)" -gt 1500000
+          test "$(stat -c%s assets/video/hero-540.mp4)" -gt 700000
+          test -s assets/img/hero-site.webp
+
+          # The final frame must still be video content, not the branded card.
+          ffmpeg -y -loglevel error -sseof -0.04 -i assets/video/hero-720.mp4 -frames:v 1 /tmp/hero-final-frame.jpg
+          test "$(stat -c%s /tmp/hero-final-frame.jpg)" -gt 20000
+
+      - name: Remove temporary source and one time workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f 'assets/video/YTDown.com_YouTube_Architectural-animation-for-the-office-b_Media_OP_fVIUTr9Y_001_1080p.mp4'
+          rm -f .github/workflows/finalize-supplied-hero.yml
+
+      - name: Commit final hero assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Finalize supplied homepage hero media'
+          git push origin HEAD:apple-premium-public-redesign
