@@ -5,6 +5,7 @@ on:
     branches: [apple-premium-public-redesign]
     paths:
       - 'assets/video/YTDown.com_YouTube_Architectural-animation-for-the-office-b_Media_OP_fVIUTr9Y_001_1080p.mp4'
+      - '.github/workflows/finalize-supplied-hero.yml'
 
 permissions:
   contents: write
@@ -19,6 +20,15 @@ jobs:
         with:
           ref: apple-premium-public-redesign
           fetch-depth: 0
+
+      - name: Install FFmpeg tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
 
       - name: Validate supplied source
         shell: bash
