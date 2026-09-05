@@ -5,6 +5,15 @@
   "use strict";
 
   const client = global.CKAStore && global.CKAStore.supabase;
+
+  function installHomepagePolish() {
+    const title = document.querySelector(".hero h1");
+    if (title && /Source\s+smarter/i.test(title.textContent || "")) {
+      title.textContent = "Build with confidence.";
+    }
+  }
+
+  installHomepagePolish();
   if (!client) return;
 
   function statusBox(form) {
