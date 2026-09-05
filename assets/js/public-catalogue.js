@@ -1,15 +1,19 @@
 /* ═══════════════════════════════════════════════════════════════
    CKA BuildStruct — public-catalogue.js
 
-   Loads the public materials catalogue from Supabase before app.js starts.
-   The shipped PRODUCTS array in data.js remains a read-only emergency
-   fallback: if Supabase is unavailable or returns an invalid catalogue,
-   this bootstrap leaves the seed data untouched and still starts the site.
+   Production bootstrap for the materials marketplace.
+   - Loads v_catalogue before the existing app starts.
+   - Keeps data.js as an emergency catalogue fallback.
+   - Bridges Supabase UUIDs to the legacy numeric cart contract.
+   - Persists checkout through the validated submit_quote RPC before
+     allowing the existing success UI to run.
    ═══════════════════════════════════════════════════════════════ */
 (function (global) {
   "use strict";
 
   const MIN_EXPECTED_PRODUCTS = 1;
+  const LIVE_ID_BASE = 100000;
+  const CART_KEY = "cka-basket-v1";
 
   function humanStock(value) {
     return ({
@@ -27,7 +31,7 @@
     return `PKR ${format(min)} – ${format(max)}`;
   }
 
-  function toProduct(row) {
+  function toProduct(row, index) {
     const specs = row.specifications && typeof row.specifications === "object"
       ? row.specifications
       : {};
@@ -38,7 +42,10 @@
     const images = [mainImage, ...gallery.filter((url) => url !== mainImage)];
 
     return {
-      id: row.id,
+      // app.js historically coerces data-* product IDs with unary +. Keep a
+      // numeric UI/cart identifier, but carry the real database UUID separately.
+      id: LIVE_ID_BASE + index,
+      dbId: row.id,
       sku: row.sku || "",
       title: row.name || "",
       category: row.category_name || "",
@@ -54,7 +61,7 @@
       brand: row.brand || "",
       supplier: row.supplier_name || "Verified supplier",
       rating: Number(row.rating) || 0,
-      deals: row.order_count == null ? 0 : row.order_count,
+      deals: row.order_count == null ? 0 : Number(row.order_count),
       stock: humanStock(row.stock),
       featured: !!row.is_featured,
       order: Number(row.display_order) || 0,
@@ -65,19 +72,152 @@
     };
   }
 
-  function startApplication() {
+  function paymentValue(label) {
+    return ({
+      "Bank Transfer": "bank_transfer",
+      "JazzCash": "jazzcash",
+      "EasyPaisa": "easypaisa",
+      "Cash on Delivery": "cod"
+    })[label] || null;
+  }
+
+  function readCart() {
+    try {
+      const value = JSON.parse(localStorage.getItem(CART_KEY));
+      return Array.isArray(value) ? value : [];
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function quoteItemsFromCart(cart) {
+    return cart.map((line) => {
+      const product = PRODUCTS.find((p) => Number(p.id) === Number(line.id));
+      if (!product) throw new Error("A basket item is no longer available.");
+
+      const quantity = Number(line.qty);
+      if (!Number.isFinite(quantity) || quantity <= 0) {
+        throw new Error("A basket item has an invalid quantity.");
+      }
+
+      // Live catalogue lines send only the trusted database identity and qty;
+      // submit_quote reads the authoritative name/unit/price server-side.
+      if (product.dbId) {
+        return {
+          product_id: product.dbId,
+          variant_id: null,
+          quantity
+        };
+      }
+
+      // Static fallback can still submit honestly as a custom line if the live
+      // catalogue fetch failed. The server validates and bounds these values.
+      return {
+        name: product.title,
+        unit: product.unit,
+        unit_price: Number(product.price) || 0,
+        quantity
+      };
+    });
+  }
+
+  function showCheckoutError(message) {
+    console.error("CKA QUOTE SUBMIT:", message);
+    global.alert(message || "Could not submit the quotation request. Please try again.");
+  }
+
+  function installRealCheckout(client) {
+    const button = document.getElementById("checkout-next");
+    const checkoutView = document.getElementById("drawer-checkout-view");
+    const form = document.getElementById("checkout-form");
+    if (!button || !checkoutView || !form || !client) return;
+
+    let allowExistingSuccessHandler = false;
+    let submitting = false;
+
+    button.addEventListener("click", async function (event) {
+      if (allowExistingSuccessHandler || checkoutView.hidden) return;
+
+      // Let app.js show its existing inline validation UI when invalid.
+      if (!form.checkValidity()) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (submitting) return;
+
+      const cart = readCart();
+      if (!cart.length) {
+        showCheckoutError("Your basket is empty. Add at least one material first.");
+        return;
+      }
+
+      submitting = true;
+      const originalHtml = button.innerHTML;
+      button.disabled = true;
+      button.textContent = "Submitting quotation…";
+
+      try {
+        const fd = new FormData(form);
+        const items = quoteItemsFromCart(cart);
+        const pay = paymentValue(String(fd.get("pay") || ""));
+        if (!pay) throw new Error("Choose a valid payment method.");
+
+        const { data: reference, error } = await client.rpc("submit_quote", {
+          p_contact_name: String(fd.get("name") || "").trim(),
+          p_contact_phone: String(fd.get("phone") || "").trim(),
+          p_items: items,
+          p_contact_email: null,
+          p_delivery_city: String(fd.get("city") || "").trim() || null,
+          p_delivery_address: String(fd.get("address") || "").trim() || null,
+          p_payment_pref: pay,
+          p_notes: String(fd.get("note") || "").trim() || null
+        });
+
+        if (error) throw error;
+        if (!reference) throw new Error("Server did not return a quotation reference.");
+
+        // Now permit the original app handler to perform its established cart
+        // clearing, form reset, drawer state transition and accessibility work.
+        button.disabled = false;
+        button.innerHTML = originalHtml;
+        allowExistingSuccessHandler = true;
+        button.click();
+        allowExistingSuccessHandler = false;
+
+        const refEl = document.getElementById("quote-ref");
+        if (refEl) refEl.textContent = String(reference);
+        console.log("CKA QUOTE SUBMITTED:", reference);
+      } catch (err) {
+        console.error("CKA QUOTE SUBMIT FAILED:", err);
+        button.disabled = false;
+        button.innerHTML = originalHtml;
+        showCheckoutError(err && err.message
+          ? err.message
+          : "Could not submit the quotation request. Please try again or contact CKA on WhatsApp.");
+      } finally {
+        submitting = false;
+        allowExistingSuccessHandler = false;
+      }
+    }, true);
+  }
+
+  function startApplication(client) {
     const script = document.createElement("script");
     script.src = "assets/js/app.js?v=27";
     script.defer = false;
     script.onerror = function () {
       console.error("CKA PUBLIC: app.js failed to load");
     };
+    script.onload = function () {
+      installRealCheckout(client);
+    };
     document.body.appendChild(script);
   }
 
   async function boot() {
+    const client = global.CKAStore && global.CKAStore.supabase;
+
     try {
-      const client = global.CKAStore && global.CKAStore.supabase;
       if (!client || typeof PRODUCTS === "undefined" || !Array.isArray(PRODUCTS)) {
         throw new Error("Supabase store or seed catalogue is unavailable");
       }
@@ -94,20 +234,23 @@
 
       const live = data
         .map(toProduct)
-        .filter((product) => product.id && product.title && product.category);
+        .filter((product) => product.dbId && product.title && product.category);
 
       if (live.length < MIN_EXPECTED_PRODUCTS) {
         throw new Error("Live catalogue rows failed validation");
       }
 
-      // PRODUCTS is declared as const in data.js, but its array contents are
-      // intentionally mutable. This preserves every existing app.js call site.
+      // Deliberately clear any legacy numeric seed-cart lines when switching to
+      // runtime IDs: matching an old numeric ID to a different live product would
+      // be worse than asking the visitor to rebuild a small basket once.
+      try { localStorage.removeItem(CART_KEY); } catch (err) {}
+
       PRODUCTS.splice(0, PRODUCTS.length, ...live);
       console.log(`CKA PUBLIC: loaded ${live.length} products from Supabase`);
     } catch (err) {
       console.warn("CKA PUBLIC: using static catalogue fallback", err);
     } finally {
-      startApplication();
+      startApplication(client);
     }
   }
 
