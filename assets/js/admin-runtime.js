@@ -7,6 +7,7 @@
    - Verify admin/staff auth before admin.js is allowed to run.
    - Normalise stock labels between the UI and PostgreSQL enum values.
    - Refuse product-image deletion while any database reference exists.
+   - Clean up newly uploaded product images that are abandoned before save.
    - Replace the legacy destructive-delete warning with a live DB warning.
 
    This file deliberately does not create a second Supabase client.
@@ -18,6 +19,7 @@
   const CONFIG = global.CKA_CONFIG || {};
   const client = STORE && STORE.supabase;
   const bucket = CONFIG.storageBucket || "project-uploads";
+  const pendingUploads = new Map(); // public URL -> storage path
 
   if (!STORE || !client) {
     console.error("CKA ADMIN: Supabase store/client is unavailable.");
@@ -67,27 +69,6 @@
       discard.hidden = true;
       banner.appendChild(discard);
     }
-  }
-
-  function installStockNormalisation() {
-    const rawList = STORE.products.list.bind(STORE.products);
-    const rawSave = STORE.products.save.bind(STORE.products);
-
-    STORE.products.list = async function () {
-      const rows = await rawList();
-      return (rows || []).map((p) => ({
-        ...p,
-        stock: STOCK_TO_UI[p.stock] || p.stock || ""
-      }));
-    };
-
-    STORE.products.save = async function (product) {
-      const p = {
-        ...product,
-        stock: STOCK_TO_DB[product.stock] || product.stock || "in_stock"
-      };
-      return rawSave(p);
-    };
   }
 
   function publicUrlForPath(path) {
@@ -173,6 +154,86 @@
     STORE.files.findImageReferences = findImageReferences;
   }
 
+  function installUploadTracking() {
+    if (!STORE.storage || typeof STORE.storage.from !== "function") return;
+
+    const rawFrom = STORE.storage.from.bind(STORE.storage);
+
+    STORE.storage.from = function (bucketName) {
+      const api = rawFrom(bucketName);
+      if (bucketName !== bucket) return api;
+
+      return new Proxy(api, {
+        get(target, prop) {
+          if (prop === "upload") {
+            return async function (path, file, options) {
+              const result = await target.upload(path, file, options);
+              if (!result.error && String(path).startsWith("product-images/")) {
+                const { data } = target.getPublicUrl(path);
+                if (data && data.publicUrl) {
+                  pendingUploads.set(data.publicUrl, path);
+                  console.log("CKA IMAGE PENDING SAVE:", path);
+                }
+              }
+              return result;
+            };
+          }
+
+          const value = target[prop];
+          return typeof value === "function" ? value.bind(target) : value;
+        }
+      });
+    };
+  }
+
+  async function cleanupPendingUploads(keepUrl) {
+    const entries = Array.from(pendingUploads.entries());
+
+    for (const [url, path] of entries) {
+      if (keepUrl && url === keepUrl) {
+        pendingUploads.delete(url);
+        continue;
+      }
+
+      try {
+        await STORE.files.remove(path);
+        pendingUploads.delete(url);
+        console.log("CKA ORPHAN IMAGE REMOVED:", path);
+      } catch (err) {
+        // Reference-check failures deliberately leave the object in place.
+        console.warn("CKA ORPHAN IMAGE CLEANUP SKIPPED:", path, err);
+      }
+    }
+  }
+
+  function installStockNormalisation() {
+    const rawList = STORE.products.list.bind(STORE.products);
+    const rawSave = STORE.products.save.bind(STORE.products);
+
+    STORE.products.list = async function () {
+      const rows = await rawList();
+      return (rows || []).map((p) => ({
+        ...p,
+        stock: STOCK_TO_UI[p.stock] || p.stock || ""
+      }));
+    };
+
+    STORE.products.save = async function (product) {
+      const p = {
+        ...product,
+        stock: STOCK_TO_DB[product.stock] || product.stock || "in_stock"
+      };
+
+      const saved = await rawSave(p);
+      const savedImage = Array.isArray(product.images) ? product.images[0] || "" : "";
+
+      // Once the DB save succeeds, the saved image is no longer an orphan;
+      // any earlier uploads from the same editor session can be removed.
+      await cleanupPendingUploads(savedImage);
+      return saved;
+    };
+  }
+
   async function requireAdminAuth() {
     const { data, error } = await client.auth.getUser();
 
@@ -195,6 +256,16 @@
 
     console.log("CKA ADMIN AUTH VERIFIED:", data.user.email);
     return data.user;
+  }
+
+  function installEditorCleanup() {
+    document.querySelectorAll("[data-close-editor]").forEach((button) => {
+      button.addEventListener("click", function () {
+        cleanupPendingUploads("").catch((err) => {
+          console.warn("CKA EDITOR CLEANUP FAILED:", err);
+        });
+      }, true);
+    });
   }
 
   function installLiveDeleteGuard() {
@@ -248,16 +319,20 @@
       if (!user) return;
 
       ensureLegacyHooks();
-      installStockNormalisation();
       installStorageSafety();
+      installUploadTracking();
+      installStockNormalisation();
 
       document.body.style.visibility = "visible";
       await loadAdminScript();
+      installEditorCleanup();
       installLiveDeleteGuard();
 
       global.CKAAdminRuntime = {
         user,
         findImageReferences,
+        cleanupPendingUploads,
+        pendingUploads,
         stockToDb: STOCK_TO_DB,
         stockToUi: STOCK_TO_UI
       };
