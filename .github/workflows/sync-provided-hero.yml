@@ -28,6 +28,8 @@ jobs:
           set -euo pipefail
           yt-dlp \
             --no-playlist \
+            --js-runtimes node \
+            --extractor-args 'youtube:player_client=tv_embedded,web_safari' \
             -f 'bestvideo[height<=720]+bestaudio/best[height<=720]' \
             --merge-output-format mp4 \
             -o '/tmp/cka-source.%(ext)s' \
