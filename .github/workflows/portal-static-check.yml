@@ -1,10 +1,10 @@
-name: Portal Static Checks
+name: Production Static Checks
 
 on:
   pull_request:
     branches: [main]
   push:
-    branches: [customer-supplier-bidding-portals]
+    branches: [customer-supplier-bidding-portals, catalogue-admin-completion]
 
 permissions:
   contents: read
@@ -24,8 +24,10 @@ jobs:
           node --check assets/js/supplier-portal.js
           node --check assets/js/admin-bidding.js
           node --check assets/js/admin-supplier-accounts.js
+          node --check assets/js/admin-runtime.js
+          node --check assets/js/admin-catalogue-pro.js
 
-      - name: Required portal assets
+      - name: Required production assets
         shell: bash
         run: |
           set -euo pipefail
@@ -33,17 +35,21 @@ jobs:
             account.html \
             customer-portal.html \
             supplier-portal.html \
+            admin.html \
             assets/css/portal.css \
+            assets/css/admin-catalogue-pro.css \
             assets/js/backend-api.js \
             assets/js/account.js \
             assets/js/customer-portal.js \
             assets/js/supplier-portal.js \
             assets/js/admin-bidding.js \
-            assets/js/admin-supplier-accounts.js; do
+            assets/js/admin-supplier-accounts.js \
+            assets/js/admin-runtime.js \
+            assets/js/admin-catalogue-pro.js; do
             test -s "$file" || { echo "Missing or empty: $file"; exit 1; }
           done
 
-      - name: Portal script references
+      - name: Script references
         shell: bash
         run: |
           set -euo pipefail
@@ -53,6 +59,9 @@ jobs:
           grep -q 'account.html' suppliers.html
           grep -q 'admin-bidding.js' assets/js/backend-api.js
           grep -q 'admin-supplier-accounts.js' assets/js/admin-bidding.js
+          grep -q 'admin-runtime.js?v=2' admin.html
+          grep -q 'admin-catalogue-pro.css' admin.html
+          grep -q 'admin-catalogue-pro.js?v=1' assets/js/admin-runtime.js
 
       - name: Migration records
         shell: bash
@@ -66,6 +75,20 @@ jobs:
             20260905124401_award_latest_supplier_revision_only.sql \
             20260905124644_anonymous_best_bid_benchmark.sql \
             20260905125009_supplier_portal_activation_by_verified_email.sql \
-            20260905130020_index_quotes_awarded_bid.sql; do
+            20260905130020_index_quotes_awarded_bid.sql \
+            20260905135551_catalogue_admin_atomic_product_and_category_management.sql \
+            20260905135648_catalogue_admin_full_product_read.sql \
+            20260905140033_catalogue_admin_atomic_batch_import.sql; do
             test -s "db/migrations/$migration" || { echo "Missing migration: $migration"; exit 1; }
           done
+
+      - name: Catalogue atomic API references
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'staff_save_catalogue_product' assets/js/admin-catalogue-pro.js
+          grep -q 'staff_catalogue_products' assets/js/admin-catalogue-pro.js
+          grep -q 'staff_catalogue_categories' assets/js/admin-catalogue-pro.js
+          grep -q 'staff_save_category' assets/js/admin-catalogue-pro.js
+          grep -q 'staff_delete_category' assets/js/admin-catalogue-pro.js
+          grep -q 'staff_import_catalogue_products' assets/js/admin-catalogue-pro.js
