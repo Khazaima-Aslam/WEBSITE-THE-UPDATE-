@@ -112,19 +112,6 @@ h1 em,h2 em{
   line-height:1.5;
 }
 
-/* Live project sites: verified self-hosted residence portfolio. */
-#showcase .showcase-tile--lg{
-  background-color:#111;
-  background-image:url("../img/live-project-residences-v3.webp");
-  background-repeat:no-repeat;
-  background-size:cover;
-  background-position:center center;
-}
-#showcase .showcase-tile--lg > img{
-  opacity:0;
-  pointer-events:none;
-}
-
 @media (max-width:833px){
   .topbar{height:36px;}
   .topbar__in{min-height:36px;font-size:11px;}
