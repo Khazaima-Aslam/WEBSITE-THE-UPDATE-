@@ -1,17 +1,16 @@
-name: Prepare Provided Hero Video
+name: Finalize Homepage Copy
 
 on:
   push:
     branches: [apple-premium-public-redesign]
     paths:
       - .github/workflows/sync-provided-hero.yml
-  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  prepare:
+  finalize:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout preview branch
@@ -20,50 +19,36 @@ jobs:
           ref: apple-premium-public-redesign
           fetch-depth: 0
 
-      - name: Install video downloader
-        run: python -m pip install --disable-pip-version-check yt-dlp
+      - name: Update homepage source copy
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          replacements = {
+            '<h1>Source <em>smarter.</em><br />Build <em>better.</em></h1>': '<h1>Build with confidence.</h1>',
+            "CKA BuildStruct is Pakistan's managed construction procurement platform &mdash; connecting project owners, builders and contractors with verified suppliers through live market rates, BOQ-based quotations and professional design support.": "CKA BuildStruct is Pakistan's managed construction procurement platform, connecting project owners, builders and contractors with verified suppliers through live market rates, BOQ based quotations and professional design support.",
+            'Rated <strong>4.9/5</strong> by 2,300+ project owners &mdash; Rawalpindi &middot; Islamabad &middot; Lahore': 'Rated <strong>4.9/5</strong> by 2,300+ project owners in Rawalpindi, Islamabad and Lahore',
+            'Drawings, materials and<br />live sites &mdash; in one place.': 'Drawings, materials and<br />live sites in one place.',
+            'field-verified drawings': 'field verified drawings',
+            'Wherever you are in your project &mdash;': 'Wherever you are in your project',
+            'Cement, steel, bricks and sand rates every morning &mdash; plus quotation support for your BOQ.': 'Cement, steel, bricks and sand rates every morning, plus quotation support for your BOQ.',
+            'IBFT / RTGS &mdash; details shared with quotation': 'IBFT / RTGS. Details shared with quotation'
+          }
+          missing = [old for old in replacements if old not in text]
+          if missing:
+              raise SystemExit('Expected homepage copy not found: ' + repr(missing))
+          for old, new in replacements.items():
+              text = text.replace(old, new)
+          p.write_text(text, encoding='utf-8')
+          PY
 
-      - name: Download the supplied architectural animation
+      - name: Remove one time helper and commit
         run: |
           set -euo pipefail
-          yt-dlp \
-            --no-playlist \
-            --js-runtimes node \
-            --extractor-args 'youtube:player_client=tv_embedded,web_safari' \
-            -f 'bestvideo[height<=720]+bestaudio/best[height<=720]' \
-            --merge-output-format mp4 \
-            -o '/tmp/cka-source.%(ext)s' \
-            'https://www.youtube.com/watch?v=OP_fVIUTr9Y'
-          SOURCE="$(find /tmp -maxdepth 1 -type f -name 'cka-source.*' | head -n 1)"
-          test -n "$SOURCE"
-          ffprobe -v error "$SOURCE"
-
-      - name: Trim branded ending and create web hero files
-        run: |
-          set -euo pipefail
-          SOURCE="$(find /tmp -maxdepth 1 -type f -name 'cka-source.*' | head -n 1)"
-          mkdir -p assets/video
-          ffmpeg -y -i "$SOURCE" -t 14.50 -an \
-            -vf 'scale=1280:-2:flags=lanczos' \
-            -c:v libx264 -preset medium -crf 28 -pix_fmt yuv420p \
-            -movflags +faststart assets/video/hero-720.mp4
-          ffmpeg -y -i "$SOURCE" -t 14.50 -an \
-            -vf 'scale=960:-2:flags=lanczos' \
-            -c:v libx264 -preset medium -crf 30 -pix_fmt yuv420p \
-            -movflags +faststart assets/video/hero-540.mp4
-          test "$(stat -c%s assets/video/hero-720.mp4)" -gt 500000
-          test "$(stat -c%s assets/video/hero-540.mp4)" -gt 300000
-          ffprobe -v error -show_entries format=duration -of default=nk=1:nw=1 assets/video/hero-720.mp4
-
-      - name: Commit prepared hero media
-        run: |
-          set -euo pipefail
-          if git diff --quiet -- assets/video/hero-720.mp4 assets/video/hero-540.mp4; then
-            echo 'Hero video already matches generated output.'
-            exit 0
-          fi
+          rm .github/workflows/sync-provided-hero.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/video/hero-720.mp4 assets/video/hero-540.mp4
-          git commit -m 'Use supplied architectural animation for homepage hero'
+          git add index.html .github/workflows/sync-provided-hero.yml
+          git commit -m 'Finalize homepage copy without decorative dashes'
           git push origin HEAD:apple-premium-public-redesign
