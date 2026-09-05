@@ -112,6 +112,25 @@ h1 em,h2 em{
   line-height:1.5;
 }
 
+/* Live project sites: show the approved residence portfolio using unique asset names.
+   This deliberately hides the legacy crane-site image so browser/CDN cache cannot
+   keep serving the previous artwork. */
+#showcase .showcase-tile--lg{
+  background-color:#111;
+  background-image:
+    url("../img/live-project-residence-1.webp"),
+    url("../img/live-project-residence-2.webp"),
+    url("../img/live-project-residence-3.webp"),
+    url("../img/live-project-residence-4.webp");
+  background-repeat:no-repeat;
+  background-size:50.2% 50.2%;
+  background-position:left top,right top,left bottom,right bottom;
+}
+#showcase .showcase-tile--lg > img{
+  opacity:0;
+  pointer-events:none;
+}
+
 @media (max-width:833px){
   .topbar{height:36px;}
   .topbar__in{min-height:36px;font-size:11px;}
