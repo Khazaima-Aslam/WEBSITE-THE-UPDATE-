@@ -1,0 +1,71 @@
+name: Portal Static Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [customer-supplier-bidding-portals]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JavaScript syntax
+        run: |
+          node --check assets/js/backend-api.js
+          node --check assets/js/account.js
+          node --check assets/js/customer-portal.js
+          node --check assets/js/supplier-portal.js
+          node --check assets/js/admin-bidding.js
+          node --check assets/js/admin-supplier-accounts.js
+
+      - name: Required portal assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in \
+            account.html \
+            customer-portal.html \
+            supplier-portal.html \
+            assets/css/portal.css \
+            assets/js/backend-api.js \
+            assets/js/account.js \
+            assets/js/customer-portal.js \
+            assets/js/supplier-portal.js \
+            assets/js/admin-bidding.js \
+            assets/js/admin-supplier-accounts.js; do
+            test -s "$file" || { echo "Missing or empty: $file"; exit 1; }
+          done
+
+      - name: Portal script references
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'assets/js/account.js' account.html
+          grep -q 'assets/js/customer-portal.js' customer-portal.html
+          grep -q 'assets/js/supplier-portal.js' supplier-portal.html
+          grep -q 'account.html' suppliers.html
+          grep -q 'admin-bidding.js' assets/js/backend-api.js
+          grep -q 'admin-supplier-accounts.js' assets/js/admin-bidding.js
+
+      - name: Migration records
+        shell: bash
+        run: |
+          set -euo pipefail
+          for migration in \
+            20260905123220_practical_line_item_bidding_v2.sql \
+            20260905123446_fix_supplier_bid_revision_key.sql \
+            20260905124020_customer_claimed_project_file_access.sql \
+            20260905124219_supplier_sanitized_bid_history.sql \
+            20260905124401_award_latest_supplier_revision_only.sql \
+            20260905124644_anonymous_best_bid_benchmark.sql \
+            20260905125009_supplier_portal_activation_by_verified_email.sql \
+            20260905130020_index_quotes_awarded_bid.sql; do
+            test -s "db/migrations/$migration" || { echo "Missing migration: $migration"; exit 1; }
+          done
