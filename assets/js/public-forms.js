@@ -47,22 +47,6 @@
         el.textContent = "IBFT / RTGS. Details shared with quotation";
       }
     });
-
-    const video = document.querySelector(".hero__video");
-    if (video && !video.dataset.ckaProvidedHero) {
-      video.dataset.ckaProvidedHero = "true";
-      video.muted = true;
-      video.loop = true;
-      video.playsInline = true;
-      const source = global.matchMedia && global.matchMedia("(max-width: 640px)").matches
-        ? "assets/video/hero-540.mp4"
-        : "assets/video/hero-720.mp4";
-      video.pause();
-      video.src = source;
-      video.load();
-      const playing = video.play();
-      if (playing && typeof playing.catch === "function") playing.catch(() => {});
-    }
   }
 
   installHomepagePolish();
