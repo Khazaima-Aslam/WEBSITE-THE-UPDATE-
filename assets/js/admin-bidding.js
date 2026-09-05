@@ -24,6 +24,12 @@
     supplierAccounts.async = true;
     document.head.appendChild(supplierAccounts);
   }
+  if (!document.querySelector('script[src*="admin-payments.js"]')) {
+    const payments = document.createElement("script");
+    payments.src = "assets/js/admin-payments.js?v=1";
+    payments.async = true;
+    document.head.appendChild(payments);
+  }
 
   function toLocalInput(value) {
     const d = value ? new Date(value) : new Date(Date.now() + 48 * 3600000);
