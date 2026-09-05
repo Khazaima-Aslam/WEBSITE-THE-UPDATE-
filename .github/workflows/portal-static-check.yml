@@ -96,7 +96,9 @@ jobs:
             20260905135648_catalogue_admin_full_product_read.sql \
             20260905140033_catalogue_admin_atomic_batch_import.sql \
             20260905152844_quote_payment_proof_verification.sql \
-            20260905153644_allow_rejected_payment_proof_resubmission.sql; do
+            20260905153644_allow_rejected_payment_proof_resubmission.sql \
+            20260905153930_harden_payment_rpc_security_boundary.sql \
+            20260905154004_optimize_quote_payment_rls_and_review_index.sql; do
             test -s "db/migrations/$migration" || { echo "Missing migration: $migration"; exit 1; }
           done
 
