@@ -16,104 +16,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Patch mobile menu and phone typography
         shell: bash
+        env:
+          PATCH_SCRIPT_B64: "CmZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aAoKYXBwID0gUGF0aCgiYXNzZXRzL2pzL2FwcC5qcyIpCnMgPSBhcHAucmVhZF90ZXh0KCkKb2xkID0gJyAgJCgiI2NhcnQtb3BlbiIpLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIiwgb3BlbkRyYXdlcik7JwpuZXcgPSAnICBjb25zdCBjYXJ0T3BlbiA9ICQoIiNjYXJ0LW9wZW4iKSB8fCAkKCIjY2FydC1idG4iKTtcbiAgaWYgKGNhcnRPcGVuKSBjYXJ0T3Blbi5hZGRFdmVudExpc3RlbmVyKCJjbGljayIsIG9wZW5EcmF3ZXIpOycKaWYgb2xkIGluIHM6CiAgICBzID0gcy5yZXBsYWNlKG9sZCwgbmV3LCAxKQoKb2xkX21lbnUgPSAiIiIgIGNvbnN0IG5hdiA9ICQoIiNuYXYiKSwgbWVudUJ0biA9ICQoIiNtZW51LWJ0biIpOwogIGZ1bmN0aW9uIGNsb3NlTWVudSgpIHsgbmF2LmNsYXNzTGlzdC5yZW1vdmUoImlzLW9wZW4iKTsgbWVudUJ0bi5pbm5lckhUTUwgPSBpY29uKCJpLW1lbnUiKTsgZG9jdW1lbnQuYm9keS5zdHlsZS5vdmVyZmxvdyA9ICIiOyBkb2N1bWVudC5ib2R5LmNsYXNzTGlzdC5yZW1vdmUoIm5hdi1vcGVuIik7IH0KICBtZW51QnRuLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIiwgKCkgPT4gewogICAgY29uc3Qgb3BlbiA9IG5hdi5jbGFzc0xpc3QudG9nZ2xlKCJpcy1vcGVuIik7CiAgICBtZW51QnRuLmlubmVySFRNTCA9IGljb24ob3BlbiA/ICJpLXgiIDogImktbWVudSIpOwogICAgZG9jdW1lbnQuYm9keS5zdHlsZS5vdmVyZmxvdyA9IG9wZW4gPyAiaGlkZGVuIiA6ICIiOwogICAgZG9jdW1lbnQuYm9keS5jbGFzc0xpc3QudG9nZ2xlKCJuYXYtb3BlbiIsIG9wZW4pOwogIH0pOwogIGNvbnN0IG5hdlNjcmltID0gJCgiI25hdi1zY3JpbSIpOwogIGlmIChuYXZTY3JpbSkgbmF2U2NyaW0uYWRkRXZlbnRMaXN0ZW5lcigiY2xpY2siLCBjbG9zZU1lbnUpOwogIG5hdkxpbmtzLmNvbmNhdChbJCgiLm5hdl9fY3RhIildKS5maWx0ZXIoQm9vbGVhbikuZm9yRWFjaCgoYSkgPT4gYS5hZGRFdmVudExpc3RlbmVyKCJjbGljayIsIGNsb3NlTWVudSkpOyIiIgpuZXdfbWVudSA9ICIiIiAgY29uc3QgbmF2ID0gJCgiI25hdiIpLCBtZW51QnRuID0gJCgiI21lbnUtYnRuIik7CiAgZnVuY3Rpb24gY2xvc2VNZW51KCkgewogICAgaWYgKCFuYXYgfHwgIW1lbnVCdG4pIHJldHVybjsKICAgIG5hdi5jbGFzc0xpc3QucmVtb3ZlKCJpcy1vcGVuIik7CiAgICBtZW51QnRuLmlubmVySFRNTCA9IGljb24oImktbWVudSIpOwogICAgbWVudUJ0bi5zZXRBdHRyaWJ1dGUoImFyaWEtZXhwYW5kZWQiLCAiZmFsc2UiKTsKICAgIGRvY3VtZW50LmJvZHkuc3R5bGUub3ZlcmZsb3cgPSAiIjsKICAgIGRvY3VtZW50LmJvZHkuY2xhc3NMaXN0LnJlbW92ZSgibmF2LW9wZW4iKTsKICB9CiAgaWYgKG5hdiAmJiBtZW51QnRuKSB7CiAgICBtZW51QnRuLnNldEF0dHJpYnV0ZSgiYXJpYS1leHBhbmRlZCIsICJmYWxzZSIpOwogICAgbWVudUJ0bi5hZGRFdmVudExpc3RlbmVyKCJjbGljayIsICgpID0+IHsKICAgICAgY29uc3Qgb3BlbiA9IG5hdi5jbGFzc0xpc3QudG9nZ2xlKCJpcy1vcGVuIik7CiAgICAgIG1lbnVCdG4uaW5uZXJIVE1MID0gaWNvbihvcGVuID8gImkteCIgOiAiaS1tZW51Iik7CiAgICAgIG1lbnVCdG4uc2V0QXR0cmlidXRlKCJhcmlhLWV4cGFuZGVkIiwgU3RyaW5nKG9wZW4pKTsKICAgICAgZG9jdW1lbnQuYm9keS5zdHlsZS5vdmVyZmxvdyA9IG9wZW4gPyAiaGlkZGVuIiA6ICIiOwogICAgICBkb2N1bWVudC5ib2R5LmNsYXNzTGlzdC50b2dnbGUoIm5hdi1vcGVuIiwgb3Blbik7CiAgICB9KTsKICAgIGNvbnN0IG5hdlNjcmltID0gJCgiI25hdi1zY3JpbSIpOwogICAgaWYgKG5hdlNjcmltKSBuYXZTY3JpbS5hZGRFdmVudExpc3RlbmVyKCJjbGljayIsIGNsb3NlTWVudSk7CiAgICBuYXZMaW5rcy5jb25jYXQoWyQoIi5uYXZfX2N0YSIpXSkuZmlsdGVyKEJvb2xlYW4pLmZvckVhY2goKGEpID0+IGEuYWRkRXZlbnRMaXN0ZW5lcigiY2xpY2siLCBjbG9zZU1lbnUpKTsKICB9IiIiCmlmIG9sZF9tZW51IGluIHM6CiAgICBzID0gcy5yZXBsYWNlKG9sZF9tZW51LCBuZXdfbWVudSwgMSkKYXBwLndyaXRlX3RleHQocykKCmluZGV4ID0gUGF0aCgiaW5kZXguaHRtbCIpCnMgPSBpbmRleC5yZWFkX3RleHQoKQppZiAnPGJvZHkgY2xhc3M9ImhvbWUtcGFnZSI+JyBub3QgaW4gczoKICAgIHMgPSBzLnJlcGxhY2UoIjxib2R5PiIsICc8Ym9keSBjbGFzcz0iaG9tZS1wYWdlIj4nLCAxKQppbmRleC53cml0ZV90ZXh0KHMpCgpjc3MgPSBQYXRoKCJhc3NldHMvY3NzL2FwcGxlLXByZW1pdW0uY3NzIikKcyA9IGNzcy5yZWFkX3RleHQoKQptYXJrZXIgPSAiLyogQ0tBIEhPTUUgTU9CSUxFIFRZUEUgUEFUQ0ggdjIgKi8iCnBhdGNoID0gIiIiCi8qIENLQSBIT01FIE1PQklMRSBUWVBFIFBBVENIIHYyICovCkBtZWRpYSAobWF4LXdpZHRoOjY0MHB4KXsKICAuaG9tZS1wYWdlewogICAgZm9udC1zaXplOjE0LjVweDsKICAgIGxpbmUtaGVpZ2h0OjEuNDU7CiAgfQogIC5ob21lLXBhZ2UgLmhlcm8gaDF7CiAgICBmb250LXNpemU6MzBweDsKICAgIGxpbmUtaGVpZ2h0OjEuMDM7CiAgICBsZXR0ZXItc3BhY2luZzotLjAyMmVtOwogIH0KICAuaG9tZS1wYWdlIC5oZXJvIC5sZWFkewogICAgZm9udC1zaXplOjE1cHg7CiAgICBsaW5lLWhlaWdodDoxLjQ4OwogIH0KICAuaG9tZS1wYWdlIGgyewogICAgZm9udC1zaXplOjI0cHg7CiAgICBsaW5lLWhlaWdodDoxLjEyOwogIH0KICAuaG9tZS1wYWdlIGgzewogICAgZm9udC1zaXplOjE3cHg7CiAgfQogIC5ob21lLXBhZ2UgLnNlYy1oZWFkX19ub3RlLAogIC5ob21lLXBhZ2UgLmxlYWQsCiAgLmhvbWUtcGFnZSBwewogICAgZm9udC1zaXplOjE0LjVweDsKICB9CiAgLmhvbWUtcGFnZSAua2lja2VyewogICAgZm9udC1zaXplOjEwcHg7CiAgfQogIC5ob21lLXBhZ2UgLmhlcm9fX3RydXN0ewogICAgZm9udC1zaXplOjEycHg7CiAgICBsaW5lLWhlaWdodDoxLjQ7CiAgfQogIC5ob21lLXBhZ2UgLnN0YXRfX2xhYmVsewogICAgZm9udC1zaXplOjExcHg7CiAgfQogIC5ob21lLXBhZ2UgLmhlcm9fX2JyYW5kcywKICAuaG9tZS1wYWdlIC5oZXJvX19icmFuZHMgcHsKICAgIGZvbnQtc2l6ZToxMS41cHg7CiAgfQogIC5ob21lLXBhZ2UgLnNob3djYXNlLXRpbGUgZmlnY2FwdGlvbiBzdHJvbmd7CiAgICBmb250LXNpemU6MTNweDsKICB9CiAgLmhvbWUtcGFnZSAuc2hvd2Nhc2UtdGlsZSBmaWdjYXB0aW9uIHNwYW57CiAgICBmb250LXNpemU6MTEuNXB4OwogICAgbGluZS1oZWlnaHQ6MS4zNTsKICB9CiAgLmhvbWUtcGFnZSAuYnRuewogICAgZm9udC1zaXplOjEzcHg7CiAgfQp9CkBtZWRpYSAobWF4LXdpZHRoOjQxOXB4KXsKICAuaG9tZS1wYWdlewogICAgZm9udC1zaXplOjE0cHg7CiAgfQogIC5ob21lLXBhZ2UgLmhlcm8gaDF7CiAgICBmb250LXNpemU6MjdweDsKICB9CiAgLmhvbWUtcGFnZSAuaGVybyAubGVhZCwKICAuaG9tZS1wYWdlIHAsCiAgLmhvbWUtcGFnZSAuc2VjLWhlYWRfX25vdGV7CiAgICBmb250LXNpemU6MTRweDsKICB9CiAgLmhvbWUtcGFnZSBoMnsKICAgIGZvbnQtc2l6ZToyMnB4OwogIH0KfQoiIiIKaWYgbWFya2VyIG5vdCBpbiBzOgogICAgcyArPSAiXG4iICsgcGF0Y2gKY3NzLndyaXRlX3RleHQocykK"
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-
-          app = Path('assets/js/app.js')
-          s = app.read_text()
-          old = '  $("#cart-open").addEventListener("click", openDrawer);'
-          new = '  const cartOpen = $("#cart-open") || $("#cart-btn");\n  if (cartOpen) cartOpen.addEventListener("click", openDrawer);'
-          if old in s:
-              s = s.replace(old, new, 1)
-          app.write_text(s)
-
-          index = Path('index.html')
-          s = index.read_text()
-          if '<body class="home-page">' not in s:
-              s = s.replace('<body>', '<body class="home-page">', 1)
-          index.write_text(s)
-
-          css = Path('assets/css/apple-premium.css')
-          s = css.read_text()
-          marker = '/* CKA HOME MOBILE TYPE PATCH v2 */'
-          if marker not in s:
-              s += r'''
-
-/* CKA HOME MOBILE TYPE PATCH v2 */
-@media (max-width:640px){
-  .home-page{
-    font-size:14.5px;
-    line-height:1.45;
-  }
-  .home-page .hero h1{
-    font-size:30px;
-    line-height:1.03;
-    letter-spacing:-.022em;
-  }
-  .home-page .hero .lead{
-    font-size:15px;
-    line-height:1.48;
-  }
-  .home-page h2{
-    font-size:24px;
-    line-height:1.12;
-  }
-  .home-page h3{
-    font-size:17px;
-  }
-  .home-page .sec-head__note,
-  .home-page .lead,
-  .home-page p{
-    font-size:14.5px;
-  }
-  .home-page .kicker{
-    font-size:10px;
-  }
-  .home-page .hero__trust{
-    font-size:12px;
-    line-height:1.4;
-  }
-  .home-page .stat__label{
-    font-size:11px;
-  }
-  .home-page .hero__brands,
-  .home-page .hero__brands p{
-    font-size:11.5px;
-  }
-  .home-page .showcase-tile figcaption strong{
-    font-size:13px;
-  }
-  .home-page .showcase-tile figcaption span{
-    font-size:11.5px;
-    line-height:1.35;
-  }
-  .home-page .btn{
-    font-size:13px;
-  }
-}
-
-@media (max-width:419px){
-  .home-page{
-    font-size:14px;
-  }
-  .home-page .hero h1{
-    font-size:27px;
-  }
-  .home-page .hero .lead,
-  .home-page p,
-  .home-page .sec-head__note{
-    font-size:14px;
-  }
-  .home-page h2{
-    font-size:22px;
-  }
-}
-'''
-          css.write_text(s)
-          PY
-
+          echo "$PATCH_SCRIPT_B64" | base64 -d > /tmp/patch.py
+          python /tmp/patch.py
           rm -f .github/workflows/mobile-menu-type-fix.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
