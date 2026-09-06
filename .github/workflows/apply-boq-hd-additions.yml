@@ -1,0 +1,64 @@
+name: Apply BOQ HD Additions
+
+on:
+  push:
+    branches: [homepage-boq-hd-swap]
+    paths:
+      - '.github/workflows/apply-boq-hd-additions.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: homepage-boq-hd-swap
+          fetch-depth: 0
+
+      - name: Add three HD BOQ slides
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text()
+          anchor = '          <img class="boq-slide boq-slide--3" src="assets/img/boq-carousel-hd-3.svg" alt="" loading="lazy" decoding="async" />\n'
+          addition = anchor + \
+            '          <img class="boq-slide boq-slide--4" src="assets/img/boq-carousel-hd-4.png" alt="" loading="lazy" decoding="async" />\n' + \
+            '          <img class="boq-slide boq-slide--5" src="assets/img/boq-carousel-hd-5.png" alt="" loading="lazy" decoding="async" />\n' + \
+            '          <img class="boq-slide boq-slide--6" src="assets/img/boq-carousel-hd-6.png" alt="" loading="lazy" decoding="async" />\n'
+          if 'boq-slide--6' not in s:
+              if s.count(anchor) != 1:
+                  raise SystemExit(f'Expected one BOQ slide 3 anchor, found {s.count(anchor)}')
+              s = s.replace(anchor, addition, 1)
+              p.write_text(s)
+          PY
+
+      - name: Verify carousel additions
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'boq-carousel-hd-4.png' index.html
+          grep -q 'boq-carousel-hd-5.png' index.html
+          grep -q 'boq-carousel-hd-6.png' index.html
+          test -s assets/img/boq-carousel-hd-4.png
+          test -s assets/img/boq-carousel-hd-5.png
+          test -s assets/img/boq-carousel-hd-6.png
+
+      - name: Commit homepage carousel update
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Add new HD BOQ sheets to homepage carousel'
+          git push origin HEAD:homepage-boq-hd-swap
