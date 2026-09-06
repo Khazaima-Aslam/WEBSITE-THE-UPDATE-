@@ -1,0 +1,305 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1448" height="1086" viewBox="0 0 1448 1086">
+<rect width="100%" height="100%" fill="white"/>
+<text x="724.0" y="28" text-anchor="middle" font-family="Times New Roman,serif" font-size="22" font-weight="700">Quantity TakeOff for Internal External Paints.</text>
+<rect x="18" y="44" width="1412" height="1024" fill="none" stroke="#111" stroke-width="1.6"/>
+<line x1="18" y1="86" x2="1430" y2="86" stroke="#333"/>
+<line x1="18" y1="122" x2="1430" y2="122" stroke="#333"/>
+<line x1="105.8" y1="44" x2="105.8" y2="1068" stroke="#555" stroke-width=".8"/>
+<line x1="622.6" y1="44" x2="622.6" y2="1068" stroke="#555" stroke-width=".8"/>
+<line x1="720.1" y1="44" x2="720.1" y2="1068" stroke="#555" stroke-width=".8"/>
+<line x1="846.9" y1="44" x2="846.9" y2="1068" stroke="#555" stroke-width=".8"/>
+<line x1="973.6" y1="44" x2="973.6" y2="1068" stroke="#555" stroke-width=".8"/>
+<line x1="1158.9" y1="44" x2="1158.9" y2="1068" stroke="#555" stroke-width=".8"/>
+<text x="61.9" y="72" text-anchor="middle" font-family="Times New Roman,serif" font-size="18" font-weight="700">Sr. No.</text>
+<text x="364.2" y="72" text-anchor="middle" font-family="Times New Roman,serif" font-size="18" font-weight="700">Description</text>
+<text x="671.3" y="72" text-anchor="middle" font-family="Times New Roman,serif" font-size="18" font-weight="700">No</text>
+<text x="783.5" y="72" text-anchor="middle" font-family="Times New Roman,serif" font-size="18" font-weight="700">L</text>
+<text x="910.3" y="72" text-anchor="middle" font-family="Times New Roman,serif" font-size="18" font-weight="700">H</text>
+<text x="1066.3" y="72" text-anchor="middle" font-family="Times New Roman,serif" font-size="18" font-weight="700">Quantity</text>
+<text x="1066.3" y="110" text-anchor="middle" font-family="Times New Roman,serif" font-size="15" font-weight="700">s.ft</text>
+<text x="1294.5" y="72" text-anchor="middle" font-family="Times New Roman,serif" font-size="18" font-weight="700">Total Quantity</text>
+<text x="1294.5" y="110" text-anchor="middle" font-family="Times New Roman,serif" font-size="15" font-weight="700">s.ft</text>
+<rect x="18" y="122.0" width="1412" height="21.9" fill="#fafafa"/>
+<text x="724.0" y="137.8" text-anchor="middle" font-family="Times New Roman,serif" font-size="17" font-weight="700">Basement Floor External Wall Paint</text>
+<line x1="18" y1="143.9" x2="1430" y2="143.9" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="159.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="115.8" y="159.7" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">E.W. Grid (6-8)(6-2)</text>
+<text x="671.3" y="159.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="159.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">37</text>
+<text x="910.3" y="159.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="159.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">370</text>
+<text x="1294.5" y="159.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">370</text>
+<line x1="18" y1="165.8" x2="1430" y2="165.8" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="181.6" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">Deductions:</text>
+<line x1="18" y1="187.7" x2="1430" y2="187.7" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="203.5" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">Window</text>
+<text x="671.3" y="203.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="203.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">0.75</text>
+<text x="910.3" y="203.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">7</text>
+<line x1="18" y1="209.6" x2="1430" y2="209.6" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="225.4" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">After Deductions:</text>
+<text x="1066.3" y="225.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">364.75</text>
+<text x="1294.5" y="225.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">364.75</text>
+<line x1="18" y1="231.5" x2="1430" y2="231.5" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="247.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">2</text>
+<text x="115.8" y="247.3" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">E.W. Grid (6-8)(D-8)</text>
+<text x="671.3" y="247.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="247.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">14.5</text>
+<text x="910.3" y="247.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="247.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">145</text>
+<text x="1294.5" y="247.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">145</text>
+<line x1="18" y1="253.4" x2="1430" y2="253.4" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="269.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">3</text>
+<text x="115.8" y="269.2" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">E.W. Grid (6-8)(6-9)</text>
+<text x="671.3" y="269.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="269.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">9</text>
+<text x="910.3" y="269.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="269.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">90</text>
+<text x="1294.5" y="269.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">90</text>
+<line x1="18" y1="275.3" x2="1430" y2="275.3" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="291.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">4</text>
+<text x="115.8" y="291.1" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">E.W. Grid (D-9)(A-3)</text>
+<text x="671.3" y="291.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="291.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">15.5</text>
+<text x="910.3" y="291.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="291.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">155</text>
+<text x="1294.5" y="291.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">155</text>
+<line x1="18" y1="297.3" x2="1430" y2="297.3" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="313.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">5</text>
+<text x="115.8" y="313.0" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">E.W. Grid (A-4)(A-2)</text>
+<text x="671.3" y="313.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="313.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">46</text>
+<text x="910.3" y="313.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="313.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">460</text>
+<text x="1294.5" y="313.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">460</text>
+<line x1="18" y1="319.2" x2="1430" y2="319.2" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="334.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">6</text>
+<text x="115.8" y="334.9" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">E.W. Grid (A-2)(6-2)</text>
+<text x="671.3" y="334.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="334.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">30</text>
+<text x="910.3" y="334.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="334.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">300</text>
+<text x="1294.5" y="334.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">300</text>
+<line x1="18" y1="341.1" x2="1430" y2="341.1" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="356.8" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">Deductions:</text>
+<line x1="18" y1="363.0" x2="1430" y2="363.0" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="378.7" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">Ventilation V5</text>
+<text x="671.3" y="378.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="378.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">3</text>
+<text x="910.3" y="378.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1.5</text>
+<text x="1066.3" y="378.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">4.5</text>
+<text x="1294.5" y="378.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">4.5</text>
+<line x1="18" y1="384.9" x2="1430" y2="384.9" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="400.7" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">Ventilation V3</text>
+<text x="671.3" y="400.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="400.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">8</text>
+<text x="910.3" y="400.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1.5</text>
+<text x="1066.3" y="400.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">12</text>
+<text x="1294.5" y="400.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">12</text>
+<line x1="18" y1="406.8" x2="1430" y2="406.8" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="422.6" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">Ventilation V4</text>
+<text x="671.3" y="422.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="422.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">3.5</text>
+<text x="910.3" y="422.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1.5</text>
+<text x="1066.3" y="422.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">5.25</text>
+<text x="1294.5" y="422.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">5.25</text>
+<line x1="18" y1="428.7" x2="1430" y2="428.7" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="444.5" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">After Deductions:</text>
+<text x="1066.3" y="444.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">278.25</text>
+<text x="1294.5" y="444.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">278.25</text>
+<line x1="18" y1="450.6" x2="1430" y2="450.6" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="466.4" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">Total Basement Ext. Wall Paint</text>
+<text x="1066.3" y="466.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">1493</text>
+<text x="1294.5" y="466.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">1493</text>
+<line x1="18" y1="472.5" x2="1430" y2="472.5" stroke="#777" stroke-width=".55"/>
+<rect x="18" y="472.5" width="1412" height="21.9" fill="#fafafa"/>
+<text x="724.0" y="488.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="17" font-weight="700">for Slab of Basement</text>
+<line x1="18" y1="494.4" x2="1430" y2="494.4" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="510.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">7</text>
+<text x="115.8" y="510.2" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">Ext. Grid (6-2)(6-8)</text>
+<text x="671.3" y="510.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="510.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">37</text>
+<text x="910.3" y="510.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">0.5</text>
+<text x="1066.3" y="510.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">18.5</text>
+<text x="1294.5" y="510.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">18.5</text>
+<line x1="18" y1="516.3" x2="1430" y2="516.3" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="532.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">8</text>
+<text x="115.8" y="532.1" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">Ext. Grid (A-2)(6-2)</text>
+<text x="671.3" y="532.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="532.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">30</text>
+<text x="910.3" y="532.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">0.5</text>
+<text x="1066.3" y="532.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">15</text>
+<text x="1294.5" y="532.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">15</text>
+<line x1="18" y1="538.2" x2="1430" y2="538.2" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="554.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">9</text>
+<text x="115.8" y="554.0" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">Ext. Grid (A-2)(A-9)</text>
+<text x="671.3" y="554.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="554.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">46</text>
+<text x="910.3" y="554.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">0.5</text>
+<text x="1066.3" y="554.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">23</text>
+<text x="1294.5" y="554.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">23</text>
+<line x1="18" y1="560.1" x2="1430" y2="560.1" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="575.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="115.8" y="575.9" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">Ext. Grid (A-9)(D-9)</text>
+<text x="671.3" y="575.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="575.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">15.5</text>
+<text x="910.3" y="575.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">0.5</text>
+<text x="1066.3" y="575.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">7.75</text>
+<text x="1294.5" y="575.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">7.75</text>
+<line x1="18" y1="582.0" x2="1430" y2="582.0" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="597.8" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">11</text>
+<text x="115.8" y="597.8" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">Ext. Grid (D-8)(D-9)</text>
+<text x="671.3" y="597.8" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="597.8" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">9</text>
+<text x="910.3" y="597.8" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">0.5</text>
+<text x="1066.3" y="597.8" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">4.5</text>
+<text x="1294.5" y="597.8" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">4.5</text>
+<line x1="18" y1="604.0" x2="1430" y2="604.0" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="619.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">12</text>
+<text x="115.8" y="619.7" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">Ext. Grid (D-8)(6-8)</text>
+<text x="671.3" y="619.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="619.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">15.25</text>
+<text x="910.3" y="619.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">0.5</text>
+<text x="1066.3" y="619.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">7.625</text>
+<text x="1294.5" y="619.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">7.625</text>
+<line x1="18" y1="625.9" x2="1430" y2="625.9" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="641.6" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">Basement Slab Paint</text>
+<text x="671.3" y="641.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">1</text>
+<text x="783.5" y="641.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">152.75</text>
+<text x="910.3" y="641.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">3</text>
+<text x="1066.3" y="641.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">76.375</text>
+<text x="1294.5" y="641.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">76.375</text>
+<line x1="18" y1="647.8" x2="1430" y2="647.8" stroke="#777" stroke-width=".55"/>
+<rect x="18" y="647.8" width="1412" height="21.9" fill="#fafafa"/>
+<text x="724.0" y="663.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="17" font-weight="700">Basement floor Internal Wall Paint</text>
+<line x1="18" y1="669.7" x2="1430" y2="669.7" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="685.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">13</text>
+<text x="115.8" y="685.4" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (A-9)(D-9)</text>
+<text x="671.3" y="685.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="685.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">14</text>
+<text x="910.3" y="685.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="685.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">140</text>
+<text x="1294.5" y="685.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">140</text>
+<line x1="18" y1="691.6" x2="1430" y2="691.6" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="707.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">14</text>
+<text x="115.8" y="707.4" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (D-9)(D-7)</text>
+<text x="671.3" y="707.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="707.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">13</text>
+<text x="910.3" y="707.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="707.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">130</text>
+<text x="1294.5" y="707.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">130</text>
+<line x1="18" y1="713.5" x2="1430" y2="713.5" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="729.3" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">Deductions: Door D2</text>
+<text x="671.3" y="729.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">1</text>
+<text x="783.5" y="729.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">4</text>
+<text x="910.3" y="729.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">7</text>
+<text x="1066.3" y="729.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">28</text>
+<text x="1294.5" y="729.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">28</text>
+<line x1="18" y1="735.4" x2="1430" y2="735.4" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="751.2" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">After Deductions: Door D2</text>
+<text x="1066.3" y="751.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">102</text>
+<text x="1294.5" y="751.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">102</text>
+<line x1="18" y1="757.3" x2="1430" y2="757.3" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="773.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">15</text>
+<text x="115.8" y="773.1" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (A-9)(A-7)</text>
+<text x="671.3" y="773.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="773.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">13</text>
+<text x="910.3" y="773.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="773.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">130</text>
+<text x="1294.5" y="773.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">130</text>
+<line x1="18" y1="779.2" x2="1430" y2="779.2" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="795.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">16</text>
+<text x="115.8" y="795.0" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (A-7)(D-7)</text>
+<text x="671.3" y="795.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="795.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">13</text>
+<text x="910.3" y="795.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="795.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">130</text>
+<text x="1294.5" y="795.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">130</text>
+<line x1="18" y1="801.1" x2="1430" y2="801.1" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="816.9" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">Deductions: Window W1</text>
+<text x="671.3" y="816.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">1</text>
+<text x="783.5" y="816.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">8</text>
+<text x="910.3" y="816.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">6</text>
+<text x="1066.3" y="816.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">48</text>
+<text x="1294.5" y="816.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">48</text>
+<line x1="18" y1="823.0" x2="1430" y2="823.0" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="838.8" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">After Deductions: Window W1</text>
+<text x="1066.3" y="838.8" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">82</text>
+<text x="1294.5" y="838.8" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">82</text>
+<line x1="18" y1="844.9" x2="1430" y2="844.9" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="860.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">17</text>
+<text x="115.8" y="860.7" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (D-8)(E-8)</text>
+<text x="671.3" y="860.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="860.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">4.75</text>
+<text x="910.3" y="860.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="860.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">47.5</text>
+<text x="1294.5" y="860.7" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">47.5</text>
+<line x1="18" y1="866.8" x2="1430" y2="866.8" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="882.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">18</text>
+<text x="115.8" y="882.6" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (E-8)(6-8)</text>
+<text x="671.3" y="882.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="882.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">8.75</text>
+<text x="910.3" y="882.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="882.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">87.5</text>
+<text x="1294.5" y="882.6" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">87.5</text>
+<line x1="18" y1="888.7" x2="1430" y2="888.7" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="904.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">19</text>
+<text x="115.8" y="904.5" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (6-8)(6-8)</text>
+<text x="671.3" y="904.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="904.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">8.75</text>
+<text x="910.3" y="904.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="904.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">87.5</text>
+<text x="1294.5" y="904.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">87.5</text>
+<line x1="18" y1="910.7" x2="1430" y2="910.7" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="926.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">20</text>
+<text x="115.8" y="926.4" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (6-8)(E-8)</text>
+<text x="671.3" y="926.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="926.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">8.75</text>
+<text x="910.3" y="926.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="926.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">87.5</text>
+<text x="1294.5" y="926.4" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">87.5</text>
+<line x1="18" y1="932.6" x2="1430" y2="932.6" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="948.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">21</text>
+<text x="115.8" y="948.3" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (D-7)(D-5)</text>
+<text x="671.3" y="948.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="948.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">6.5</text>
+<text x="910.3" y="948.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="948.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">65</text>
+<text x="1294.5" y="948.3" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">65</text>
+<line x1="18" y1="954.5" x2="1430" y2="954.5" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="970.2" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">Deductions: Window W5</text>
+<text x="671.3" y="970.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">1</text>
+<text x="783.5" y="970.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">5</text>
+<text x="910.3" y="970.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">6</text>
+<text x="1066.3" y="970.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">30</text>
+<text x="1294.5" y="970.2" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">30</text>
+<line x1="18" y1="976.4" x2="1430" y2="976.4" stroke="#777" stroke-width=".55"/>
+<text x="115.8" y="992.1" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="700">After Deductions: Window W5</text>
+<text x="1066.3" y="992.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">35</text>
+<text x="1294.5" y="992.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="700">35</text>
+<line x1="18" y1="998.3" x2="1430" y2="998.3" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="1014.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">22</text>
+<text x="115.8" y="1014.1" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (D-6)(6-6)</text>
+<text x="671.3" y="1014.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="1014.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">9.375</text>
+<text x="910.3" y="1014.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="1014.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">93.75</text>
+<text x="1294.5" y="1014.1" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">93.75</text>
+<line x1="18" y1="1020.2" x2="1430" y2="1020.2" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="1036.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">23</text>
+<text x="115.8" y="1036.0" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (6-6)(6-4)</text>
+<text x="671.3" y="1036.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="1036.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">13.375</text>
+<text x="910.3" y="1036.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="1036.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">133.75</text>
+<text x="1294.5" y="1036.0" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">133.75</text>
+<line x1="18" y1="1042.1" x2="1430" y2="1042.1" stroke="#777" stroke-width=".55"/>
+<text x="61.9" y="1057.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">24</text>
+<text x="115.8" y="1057.9" text-anchor="start" font-family="Times New Roman,serif" font-size="14" font-weight="400">I.W. Grid (6-4)(D-4)</text>
+<text x="671.3" y="1057.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">1</text>
+<text x="783.5" y="1057.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">13.375</text>
+<text x="910.3" y="1057.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">10</text>
+<text x="1066.3" y="1057.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">133.75</text>
+<text x="1294.5" y="1057.9" text-anchor="middle" font-family="Times New Roman,serif" font-size="14" font-weight="400">133.75</text>
+<line x1="18" y1="1064.0" x2="1430" y2="1064.0" stroke="#777" stroke-width=".55"/>
+</svg>
