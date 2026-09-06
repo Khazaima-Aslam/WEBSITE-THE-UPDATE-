@@ -651,7 +651,8 @@
     document.body.style.overflow = "";
     if (mode === "success") { setMode("items"); renderCart(); }
   }
-  $("#cart-open").addEventListener("click", openDrawer);
+  const cartOpen = $("#cart-open") || $("#cart-btn");
+  if (cartOpen) cartOpen.addEventListener("click", openDrawer);
   $$("[data-open-drawer]").forEach((el) => el.addEventListener("click", openDrawer));
   $$("[data-close-drawer]").forEach((el) => el.addEventListener("click", closeDrawer));
 
@@ -824,16 +825,27 @@
 
   /* ── 11 · mobile menu ────────────────────────────────────── */
   const nav = $("#nav"), menuBtn = $("#menu-btn");
-  function closeMenu() { nav.classList.remove("is-open"); menuBtn.innerHTML = icon("i-menu"); document.body.style.overflow = ""; document.body.classList.remove("nav-open"); }
-  menuBtn.addEventListener("click", () => {
-    const open = nav.classList.toggle("is-open");
-    menuBtn.innerHTML = icon(open ? "i-x" : "i-menu");
-    document.body.style.overflow = open ? "hidden" : "";
-    document.body.classList.toggle("nav-open", open);
-  });
-  const navScrim = $("#nav-scrim");
-  if (navScrim) navScrim.addEventListener("click", closeMenu);
-  navLinks.concat([$(".nav__cta")]).filter(Boolean).forEach((a) => a.addEventListener("click", closeMenu));
+  function closeMenu() {
+    if (!nav || !menuBtn) return;
+    nav.classList.remove("is-open");
+    menuBtn.innerHTML = icon("i-menu");
+    menuBtn.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+    document.body.classList.remove("nav-open");
+  }
+  if (nav && menuBtn) {
+    menuBtn.setAttribute("aria-expanded", "false");
+    menuBtn.addEventListener("click", () => {
+      const open = nav.classList.toggle("is-open");
+      menuBtn.innerHTML = icon(open ? "i-x" : "i-menu");
+      menuBtn.setAttribute("aria-expanded", String(open));
+      document.body.style.overflow = open ? "hidden" : "";
+      document.body.classList.toggle("nav-open", open);
+    });
+    const navScrim = $("#nav-scrim");
+    if (navScrim) navScrim.addEventListener("click", closeMenu);
+    navLinks.concat([$(".nav__cta")]).filter(Boolean).forEach((a) => a.addEventListener("click", closeMenu));
+  }
 
   /* ── 12 · privacy / terms modals ─────────────────────────── */
   function openModal(id) {
