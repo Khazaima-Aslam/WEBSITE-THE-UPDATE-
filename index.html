@@ -66,47 +66,38 @@
     <symbol id="i-chat" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
     <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
     <symbol id="i-badge" viewBox="0 0 24 24"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/></symbol>
-    <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></symbol>
-    <symbol id="i-fb" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></symbol>
-    <symbol id="i-ig" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></symbol>
-    <symbol id="i-in" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12" fill="currentColor" stroke="none"/><circle cx="4" cy="4" r="2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></symbol>
   </defs>
 </svg>
 
-<!-- =========== TOP BAR =========== -->
-<div class="topbar" role="region" aria-label="Contact and rate notice">
+<div class="topbar">
   <div class="container topbar__in">
-    <span>Supplier market rates verified daily &middot; Rawalpindi &amp; Islamabad</span>
-    <span class="topbar__right">
-      <a href="tel:+923155387676">+92 315 5387676</a>
-      <a href="https://wa.me/923155387676" target="_blank" rel="noopener">WhatsApp us</a>
-    </span>
+    <div><strong>Daily verified rates</strong> for cement, steel, sand &amp; finishing materials</div>
+    <div class="topbar__right"><a href="tel:+923155387676">+92 315 5387676</a><a href="mailto:info@ckabuildstruct.com">info@ckabuildstruct.com</a></div>
   </div>
 </div>
 
-<!-- =========== HEADER =========== -->
 <header class="header" id="header">
   <div class="container header__in">
-    <a class="brand" href="index.html" aria-label="CKA BuildStruct home">
-      <img class="brand__logo" src="assets/img/logo-mark.png" alt="CKA BuildStruct logo" width="200" height="200" decoding="async" />
+    <a class="brand" href="index.html">
+      <img class="brand__logo" src="assets/img/logo.png" alt="CKA BuildStruct logo" width="320" height="320" decoding="async" />
       <span class="brand__txt"><b>CKA</b><i>BuildStruct</i></span>
     </a>
 
-    <nav class="nav" id="nav" aria-label="Primary">
+    <nav class="nav" id="nav" aria-label="Primary navigation">
       <a href="index.html" class="nav__link is-active">Home</a>
-      <a href="construction.html" class="nav__link">Construction</a>
       <a href="materials.html" class="nav__link">Materials</a>
+      <a href="project.html" class="nav__link">Post a Project</a>
       <a href="design.html" class="nav__link">Design</a>
       <a href="suppliers.html" class="nav__link">Suppliers</a>
-      <a href="project.html" class="nav__link">Post a Project</a>
-      <a href="daily-updates.html" class="nav__link">Daily Updates</a>
       <a href="about.html" class="nav__link">About</a>
       <a href="contact.html" class="nav__link">Contact</a>
+      <a href="account.html" class="nav__link">Account</a>
       <a href="materials.html" class="btn btn--brand nav__cta">Request a Quote</a>
     </nav>
 
     <div class="header__actions">
-      <button class="cart-btn" id="cart-open" aria-label="Open quotation basket">
+      <button class="cart-btn" id="cart-btn" aria-label="Open quotation basket">
         <svg class="ic"><use href="#i-cart"/></svg>
         <span class="cart-btn__count" id="cart-count">0</span>
       </button>
@@ -188,8 +179,12 @@
         <img src="assets/img/drawing-plans.webp" alt="Printed architectural and structural drawing set" loading="lazy" width="500" height="312" decoding="async" />
         <figcaption><strong>Architectural &amp; structural drawings</strong><span>CDA-standard drawing sets, field-verified before execution.</span></figcaption>
       </figure>
-      <figure class="showcase-tile">
-        <img src="assets/img/online-services.webp" alt="Rolled blueprints beside a laptop showing a bill of quantities" loading="lazy" width="612" height="408" decoding="async" />
+      <figure class="showcase-tile showcase-tile--boq">
+        <div class="boq-carousel" aria-hidden="true">
+          <img class="boq-slide boq-slide--1" src="assets/img/boq-carousel-1.webp" alt="" loading="lazy" decoding="async" />
+          <img class="boq-slide boq-slide--2" src="assets/img/boq-carousel-2.webp" alt="" loading="lazy" decoding="async" />
+          <img class="boq-slide boq-slide--3" src="assets/img/boq-carousel-3.webp" alt="" loading="lazy" decoding="async" />
+        </div>
         <figcaption><strong>BOQ &amp; cost estimation</strong><span>Itemised bills of quantities, priced against daily market rates.</span></figcaption>
       </figure>
       <figure class="showcase-tile">
@@ -222,7 +217,55 @@
   </div>
 </section>
 
-</main>
+<!-- =========== MATERIAL CATEGORIES =========== -->
+<section class="sec" id="materials">
+  <div class="container">
+    <div class="sec-head" data-reveal>
+      <div><p class="kicker"><span class="kn">02</span> Marketplace</p><h2>Everything your project needs.</h2></div>
+      <p class="sec-head__note">Verified rates. Screened suppliers. Delivered to your site.</p>
+    </div>
+
+    <div class="category-grid" data-reveal-group>
+      <article class="cat-card">
+        <div class="cat-card__icon"><svg class="ic"><use href="#i-building"/></svg></div>
+        <h3>Structure</h3><p>Cement, steel, blocks, bricks &amp; aggregate</p>
+        <a href="materials.html?cat=structure" class="cat-card__more">Browse <svg class="ic"><use href="#i-arrow-r"/></svg></a>
+      </article>
+      <article class="cat-card">
+        <div class="cat-card__icon"><svg class="ic"><use href="#i-layers"/></svg></div>
+        <h3>Finishing</h3><p>Tiles, sanitary, paint, ceilings &amp; fixtures</p>
+        <a href="materials.html?cat=finishing" class="cat-card__more">Browse <svg class="ic"><use href="#i-arrow-r"/></svg></a>
+      </article>
+      <article class="cat-card">
+        <div class="cat-card__icon"><svg class="ic"><use href="#i-zap"/></svg></div>
+        <h3>MEP</h3><p>Electrical, plumbing, HVAC &amp; fire systems</p>
+        <a href="materials.html?cat=mep" class="cat-card__more">Browse <svg class="ic"><use href="#i-arrow-r"/></svg></a>
+      </article>
+      <article class="cat-card">
+        <div class="cat-card__icon"><svg class="ic"><use href="#i-compass"/></svg></div>
+        <h3>Design &amp; BOQ</h3><p>Architectural drawings, structural design &amp; cost estimation</p>
+        <a href="design.html" class="cat-card__more">Explore <svg class="ic"><use href="#i-arrow-r"/></svg></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- =========== TRUST =========== -->
+<section class="sec sec--dark" id="trust">
+  <div class="container">
+    <div class="sec-head sec-head--dark" data-reveal>
+      <div><p class="kicker kicker--light"><span class="kn">03</span> Why CKA</p><h2>Built for projects that<br />cannot afford delays.</h2></div>
+      <p class="sec-head__note">One team coordinates suppliers, quotations and technical documentation end to end.</p>
+    </div>
+
+    <div class="trust-grid" data-reveal-group>
+      <article class="trust-card"><span class="trust-card__n">01</span><svg class="ic"><use href="#i-badge"/></svg><h3>Verified suppliers</h3><p>Every supplier is screened for NTN, business history and delivery performance before listing.</p></article>
+      <article class="trust-card"><span class="trust-card__n">02</span><svg class="ic"><use href="#i-scale"/></svg><h3>Daily market rates</h3><p>Rates verified each morning from authorised dealers across Islamabad, Rawalpindi and Lahore.</p></article>
+      <article class="trust-card"><span class="trust-card__n">03</span><svg class="ic"><use href="#i-truck"/></svg><h3>On-time delivery</h3><p>Each dispatch is tracked to your site. Delivery confirmation with photo proof.</p></article>
+      <article class="trust-card"><span class="trust-card__n">04</span><svg class="ic"><use href="#i-file"/></svg><h3>Professional documentation</h3><p>BOQs, comparison sheets and drawings prepared and reviewed by experienced engineers.</p></article>
+    </div>
+  </div>
+</section>
 
 <!-- =========== CTA BAND =========== -->
 <section class="cta">
@@ -338,15 +381,15 @@
     </div>
 
     <div class="drawer__body drawer__success" id="drawer-success-view" hidden>
-      <span class="success-ic"><svg class="ic"><use href="#i-check-c" class="tick-draw"/></svg></span>
-      <h4>Quotation request received</h4>
-      <p>Reference <strong id="quote-ref">CKA-Q-0000</strong></p>
-      <p class="drawer__success-note">CKA will confirm supplier rates first and share your consolidated quotation on WhatsApp shortly.</p>
-      <button class="btn btn--dark btn--block" data-close-drawer>Continue Browsing</button>
+      <div class="success-icon"><svg class="ic"><use href="#i-check-c"/></svg></div>
+      <h3>Quotation request received</h3>
+      <p>CKA will verify quantities, compare screened suppliers and contact you with the best available quotation.</p>
+      <p><strong>Reference:</strong> <span id="checkout-ref">&mdash;</span></p>
+      <a class="btn btn--dark" href="customer-portal.html">View Customer Portal</a>
     </div>
 
-    <footer class="drawer__foot" id="drawer-foot">
-      <div class="drawer__subtotal"><span>Estimated subtotal</span><strong id="drawer-subtotal">PKR 0</strong><small>Final rate confirmed after supplier bidding</small></div>
+    <footer class="drawer__foot">
+      <div class="drawer__total"><span>Estimated basket total</span><strong id="drawer-total">PKR 0</strong></div>
       <div class="drawer__actions">
         <button class="btn btn--line" id="back-to-basket" hidden>Back</button>
         <button class="btn btn--brand btn--lg" id="checkout-next">Open Quick Checkout <svg class="ic"><use href="#i-arrow-r"/></svg></button>
@@ -428,49 +471,11 @@
         { "@type": "City", "name": "Islamabad" },
         { "@type": "City", "name": "Rawalpindi" },
         { "@type": "City", "name": "Lahore" },
-        { "@type": "City", "name": "Attock" },
-        { "@type": "City", "name": "Abbottabad" }
+        { "@type": "City", "name": "Faisalabad" },
+        { "@type": "City", "name": "Peshawar" }
       ],
-      "openingHoursSpecification": [{
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
-        "opens": "09:00",
-        "closes": "19:00"
-      }],
-      "sameAs": ["https://www.instagram.com/ckabuildstructofficial"],
-      "contactPoint": [
-        { "@type": "ContactPoint", "contactType": "sales", "telephone": "+92-315-5387676", "email": "info@ckabuildstruct.com", "areaServed": "PK", "availableLanguage": ["en","ur"] },
-        { "@type": "ContactPoint", "contactType": "supplier registration", "email": "suppliers@ckabuildstruct.com", "areaServed": "PK" }
-      ],
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Construction materials and services",
-        "itemListElement": [
-          { "@type": "OfferCatalog", "name": "Grey structure materials" },
-          { "@type": "OfferCatalog", "name": "Finishing materials" },
-          { "@type": "OfferCatalog", "name": "Plumbing materials" },
-          { "@type": "OfferCatalog", "name": "Design and BOQ services" },
-          { "@type": "OfferCatalog", "name": "Construction and project management" }
-        ]
-      }
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://www.ckabuildstruct.com/#website",
-      "url": "https://www.ckabuildstruct.com/",
-      "name": "CKA BuildStruct",
-      "publisher": { "@id": "https://www.ckabuildstruct.com/#org" },
-      "inLanguage": "en-PK"
-    },
-    {
-      "@type": "FAQPage",
-      "@id": "https://www.ckabuildstruct.com/about.html#faq",
-      "mainEntity": [
-        { "@type": "Question", "name": "Are the rates shown on the website final?", "acceptedAnswer": { "@type": "Answer", "text": "Listed rates are indicative market rates verified daily across supplier depots in Rawalpindi and Islamabad. When you submit a basket or BOQ, suppliers bid against your exact quantity and delivery point, and the confirmed quotation locks your rate for the agreed delivery window." } },
-        { "@type": "Question", "name": "How does live supplier bidding work?", "acceptedAnswer": { "@type": "Answer", "text": "Your requirement is shared with screened suppliers on a managed tender board. Suppliers submit rate, delivery timeline and payment terms, and CKA compiles a comparison sheet with reliability scores so you can pick the best value rather than only the lowest rate." } },
-        { "@type": "Question", "name": "Do you deliver outside Rawalpindi and Islamabad?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Active delivery corridors include Lahore, Attock, Chakwal, Jhelum, Taxila, Wah, Abbottabad and northern Punjab. Freight is quoted per project so the rate stays transparent." } },
-        { "@type": "Question", "name": "What payment methods are accepted?", "acceptedAnswer": { "@type": "Answer", "text": "Bank transfer via IBFT or RTGS, JazzCash, EasyPaisa, and cash on delivery for orders under PKR 200,000. Corporate clients can request 15 to 30 day credit terms after account verification." } },
-        { "@type": "Question", "name": "Can I upload my own BOQ or drawings?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. PDF, Excel and image uploads are supported on the project form. If you do not have a BOQ, the design studio can prepare one for your plot starting from PKR 9,999." } }
+      "sameAs": [
+        "https://www.instagram.com/ckabuildstructofficial"
       ]
     }
   ]

@@ -49,7 +49,80 @@
     });
   }
 
+  function installBoqCarousel() {
+    const tile = document.querySelector(".showcase-tile--boq");
+    const carousel = tile && tile.querySelector(".boq-carousel");
+    const slides = carousel ? Array.from(carousel.querySelectorAll(".boq-slide")) : [];
+    if (!tile || !carousel || slides.length < 2) return;
+
+    carousel.style.position = "absolute";
+    carousel.style.inset = "0";
+    carousel.style.overflow = "hidden";
+    carousel.style.background = "#f3f1ec";
+
+    slides.forEach((slide) => {
+      slide.style.position = "absolute";
+      slide.style.left = "0";
+      slide.style.top = "0";
+      slide.style.width = "100%";
+      slide.style.height = "auto";
+      slide.style.maxWidth = "none";
+      slide.style.objectFit = "contain";
+      slide.style.opacity = "0";
+      slide.style.transform = "translateY(0) scale(1.02)";
+      slide.style.transformOrigin = "top center";
+      slide.style.willChange = "transform, opacity";
+    });
+
+    const reducedMotion = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) {
+      slides[0].style.opacity = "1";
+      slides[0].style.transform = "translateY(-8%) scale(1.02)";
+      return;
+    }
+
+    let current = -1;
+    let timer = null;
+
+    function showSlide(next) {
+      if (current >= 0) {
+        const previous = slides[current];
+        previous.style.transition = "opacity .55s ease";
+        previous.style.opacity = "0";
+      }
+
+      const slide = slides[next];
+      slide.style.transition = "none";
+      slide.style.opacity = "0";
+      slide.style.transform = "translateY(0) scale(1.02)";
+      void slide.offsetHeight;
+
+      requestAnimationFrame(() => {
+        slide.style.transition = "opacity .65s ease, transform 4.4s linear";
+        slide.style.opacity = "1";
+        slide.style.transform = "translateY(-42%) scale(1.04)";
+      });
+
+      current = next;
+    }
+
+    showSlide(0);
+    timer = global.setInterval(() => showSlide((current + 1) % slides.length), 5000);
+
+    tile.addEventListener("mouseenter", () => {
+      if (timer) {
+        global.clearInterval(timer);
+        timer = null;
+      }
+    });
+
+    tile.addEventListener("mouseleave", () => {
+      if (!timer) timer = global.setInterval(() => showSlide((current + 1) % slides.length), 5000);
+    });
+  }
+
   installHomepagePolish();
+  installBoqCarousel();
   if (!client) return;
 
   function statusBox(form) {
