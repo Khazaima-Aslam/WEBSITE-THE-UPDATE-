@@ -131,8 +131,74 @@
     });
   }
 
+  function installStructuralCarousel() {
+    const tile = Array.from(document.querySelectorAll(".showcase-tile")).find((item) => {
+      const label = item.querySelector("figcaption strong");
+      return label && /^structural works$/i.test((label.textContent || "").trim());
+    });
+    if (!tile) return;
+
+    const primary = tile.querySelector("img");
+    if (!primary) return;
+
+    primary.src = "assets/img/structural-carousel-1.webp";
+    primary.alt = "Structural analysis heat map of a complex building frame";
+    primary.loading = "lazy";
+    primary.decoding = "async";
+    primary.classList.add("structural-slide");
+
+    const secondary = primary.cloneNode(false);
+    secondary.src = "assets/img/structural-carousel-2.webp";
+    secondary.alt = "Multi-storey structural frame with engineering analysis contours";
+    secondary.classList.add("structural-slide");
+
+    const caption = tile.querySelector("figcaption");
+    if (caption) tile.insertBefore(secondary, caption);
+    else tile.appendChild(secondary);
+
+    const slides = [primary, secondary];
+    slides.forEach((slide, index) => {
+      slide.style.opacity = index === 0 ? "1" : "0";
+      slide.style.transform = "scale(1.02)";
+      slide.style.transformOrigin = "center";
+      slide.style.transition = "opacity .7s ease, transform 4.5s ease";
+      slide.style.willChange = "opacity, transform";
+    });
+
+    const reducedMotion = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) return;
+
+    let current = 0;
+    let timer = null;
+
+    const show = (next) => {
+      slides.forEach((slide, index) => {
+        slide.style.opacity = index === next ? "1" : "0";
+        slide.style.transform = index === next ? "scale(1.05)" : "scale(1.02)";
+      });
+      current = next;
+    };
+
+    const stop = () => {
+      if (timer) global.clearInterval(timer);
+      timer = null;
+    };
+
+    const start = () => {
+      stop();
+      timer = global.setInterval(() => show((current + 1) % slides.length), 4500);
+    };
+
+    start();
+    tile.addEventListener("mouseenter", stop);
+    tile.addEventListener("mouseleave", start);
+    tile.addEventListener("focusin", stop);
+    tile.addEventListener("focusout", start);
+  }
+
   installHomepagePolish();
   installBoqCarousel();
+  installStructuralCarousel();
   if (!client) return;
 
   function statusBox(form) {
