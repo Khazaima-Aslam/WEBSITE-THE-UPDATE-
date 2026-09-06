@@ -55,6 +55,16 @@
     const slides = carousel ? Array.from(carousel.querySelectorAll(".boq-slide")) : [];
     if (!tile || !carousel || slides.length < 2) return;
 
+    const hdSlides = [
+      "assets/img/boq-carousel-hd-4.svg",
+      "assets/img/boq-carousel-hd-5.svg",
+      "assets/img/boq-carousel-hd-6.svg"
+    ];
+    hdSlides.forEach((src, index) => {
+      const slide = slides[index + 3];
+      if (slide) slide.src = src;
+    });
+
     carousel.style.position = "absolute";
     carousel.style.inset = "0";
     carousel.style.overflow = "hidden";
