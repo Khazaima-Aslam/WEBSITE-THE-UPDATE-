@@ -960,7 +960,7 @@ textarea.input{ resize:vertical; min-height:64px; }
 /* video intro & parallax scaffolding */
 .hero__media{
   transform:scale(1.15);
-  background:url("../img/hero-site.webp") center/cover no-repeat var(--dark);
+  background:var(--dark);
   will-change:transform;
 }
 .hero__video{
@@ -970,7 +970,7 @@ textarea.input{ resize:vertical; min-height:64px; }
 .hero__video.is-on{ opacity:1; transform:scale(1.005); }
 
 /* loop-point crossfade — JS dips the video near the wrap so the cut
-   blends into the poster frame painted underneath on .hero__media */
+   blends into the dark base painted underneath on .hero__media */
 .hero__video.is-looping{ opacity:.38; transition:opacity .5s ease, transform 1.8s var(--ease); }
 
 /* headline sheen — one slow sweep of light across the serif italics
